@@ -21,29 +21,28 @@ module Slideshare
   # Adapts an API URL, providing a method to get its content.
   class URL
   
-    attr_reader  :path, :params, :url
+    attr_reader  :path,  :query, :complete_path, :params, :url
     alias :adaptee :url
   
     BASE_URL="http://www.slideshare.net/api/2/"
   
     # initializes a new slideshare url, appending the given path to the base API URL,
     # and if provided, an URL-encoded flavor of the given args
-    def initialize(path,args={})
-      raise ArgumentError.new("path cannot be nil") if path.nil?
-      partial_url=BASE_URL+path.to_s
-      @path=path
-      @params=args
-      @url= URI.parse(partial_url + ( args.empty? ? "" : "?"+args.to_a.map{|i| escape(i[0])+"="+escape(i[1])}.join("&") ))
+    def initialize(_path,args={})
+      raise ArgumentError.new("path cannot be nil") if _path.nil?
+      @path = _path.to_s
+      @query = args.to_a.map{|i| escape(i[0])+"="+escape(i[1])}.join("&")
+      @complete_path = path + (query.empty? ? "" : "?"+query)
+      @params = args
+      @url = URI.parse(BASE_URL+complete_path)
     end
   
     # Requests the document pointed by this URL
     #
     # optionally you can provide a proxy to perform the Request.
     def get(proxy=nil)
-      raise ArgumentError.new "if present, proxy must or respond to :start" unless proxy.nil? or proxy.respond_to? :start
       net = (proxy.nil? ? Net::HTTP : proxy)
-      req = Net::HTTP::Get.new(url.path)
-      res = net.start(url.host, url.port) {|http| http.request(req) }
+      res=net.get_response(url)
       raise HTTPError.new(res.class) unless res.kind_of? Net::HTTPSuccess
       res.body
     end
@@ -94,14 +93,16 @@ module Slideshare
      def uses_authentication?
        not user.nil?
      end 
-     
-     #Performs a get request through this proxy by inverting the control
-     #to the Slideshare::URL instance given
-     def get(url)
-       raise ArgumentError.new "URL must be a Slideshare::URL instance and it's #{url}" unless url.kind_of? Slideshare::URL
-       url.get(proxy)
+
+     #tries to delagate unhandled requests to de proxy instance adapted
+     def method_missing(method,*args,&b)
+      if proxy.respond_to? method
+        proxy.method(method).call(*args,&b)
+      else
+        super.method_missing(method, *args,&b)
+      end
      end
-     
+
      def hash
        host.hash
      end
@@ -110,14 +111,10 @@ module Slideshare
        host.eql?(other.host) and port.eql?(other.port) and user.eql?(other.user) and password.eql?(other.password)
      end
      
-     #delegates start method invocation to its adaptee
-     def start(host,port=80,&b)
-        proxy.start(host,port,&b)
-     end
-     
      def to_s
        "#{user}@#{host}:#{port}"
      end
    end
-
+   
 end
+

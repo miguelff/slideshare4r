@@ -9,6 +9,9 @@ require 'rake/clean'
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'rake/testtask'
+require 'spec/rake/spectask'
+
+
 
 spec = Gem::Specification.new do |s|
   s.name = 'slideshare4r'
@@ -40,6 +43,15 @@ Rake::RDocTask.new do |rdoc|
   rdoc.options << '--line-numbers'
 end
 
+desc "Run all tasks"
 Rake::TestTask.new do |t|
   t.test_files = FileList['test/**/*.rb']
 end
+
+desc "Run all specs"
+Spec::Rake::SpecTask.new('spec') do |t|
+  t.spec_opts=["-f s"]
+  t.spec_files = FileList['spec/**/*.rb']
+end
+
+task :default => [:spec,:test]

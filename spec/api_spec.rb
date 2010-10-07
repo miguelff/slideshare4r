@@ -12,15 +12,15 @@ describe API do
   end
 
    it "should failed initializitaion when either api_key or shared_secret is nil" do
-    lambda{API.new nil,"xxx"}.should raise_error
-    lambda{API.new "xxx",nil}.should raise_error
-    lambda{API.new nil,nil}.should raise_error
+    lambda{API.new nil,"xxx"}.should raise_error(ArgumentError)
+    lambda{API.new "xxx",nil}.should raise_error(ArgumentError)
+    lambda{API.new nil,nil}.should raise_error(ArgumentError)
   end
 
    it "should failed initializitaion when neither api_key nor shared_secret is a string " do
-    lambda{API.new "xxx",4}.should raise_error
-    lambda{API.new 4,"xxx"}.should raise_error
-    lambda{API.new 4,4}.should raise_error
+    lambda{API.new "xxx",4}.should raise_error(ArgumentError)
+    lambda{API.new 4,"xxx"}.should raise_error(ArgumentError)
+    lambda{API.new 4,4}.should raise_error(ArgumentError)
   end
   
   it "should set properties properly when optional arguments are provided" do
@@ -35,10 +35,45 @@ describe API do
   end
   
   it "should fail initialization if proxy port is not a number between 0 and 65535" do
-    lambda{API.new "foo","bar",:proxy_host=>"proxy.foo.com",:proxy_port=>"wrong"}.should raise_error
-    lambda{API.new "foo","bar",:proxy_host=>"proxy.foo.com",:proxy_port=>65536}.should raise_error
-    lambda{API.new "foo","bar",:proxy_host=>"proxy.foo.com",:proxy_port=>-1}.should raise_error
-    lambda{API.new "foo","bar",:proxy_host=>"proxy.foo.com",:proxy_port=>8888}.should_not raise_error
+    lambda{API.new "foo","bar",:proxy_host=>"proxy.foo.com",:proxy_port=>"wrong"}.should raise_error(ArgumentError)
+    lambda{API.new "foo","bar",:proxy_host=>"proxy.foo.com",:proxy_port=>65536}.should raise_error(ArgumentError)
+    lambda{API.new "foo","bar",:proxy_host=>"proxy.foo.com",:proxy_port=>-1}.should raise_error(ArgumentError)
+    lambda{API.new "foo","bar",:proxy_host=>"proxy.foo.com",:proxy_port=>8888}.should_not raise_error(ArgumentError)
   end
+  
+
+  
+  describe "get_slideshow" do
+    before(:each) do
+      @api=API.new Config::API_KEY, Config::SHARED_SECRET, :proxy_host=>Config::PROXY_HOST, :proxy_port=>Config::PROXY_PORT
+    end 
+    
+    it "should raise an error if neither :slideshow_id nor :slideshow_url are provided" do
+      lambda{@api.get_slideshow}.should raise_error(ArgumentError)
+    end
+    
+     it "should not raise an error if either :slideshow_id or :slideshow_url are provided" do
+        lambda{@api.get_slideshow :slideshow_id=>Config::SAMPLE_SLIDESHOW_ID}.should_not raise_error(ArgumentError)
+        lambda{ @api.get_slideshow :slideshow_url=>Config::SAMPLE_SLIDESHOW_URL}.should_not raise_error(ArgumentError)
+      end
+    
+    it "should raise an error if :exclude_tags is neither true nor false" do
+      lambda{@api.get_slideshow :slideshow_url=>Config::SAMPLE_SLIDESHOW_URL, :exclude_tags=>1}.should raise_error(ArgumentError)
+    end
+    
+    it "should raise an error if :detailed is neither true nor false" do
+      lambda{@api.get_slideshow :slideshow_url=>Config::SAMPLE_SLIDESHOW_URL, :detailed=>1}.should raise_error(ArgumentError)
+    end
+
+    
+    it "should retrieve detailed content when requested" do
+      slideshow=@api.get_slideshow(:slideshow_url=>Config::SAMPLE_SLIDESHOW_URL, :detailed=>true)
+      slideshow.should_not be_nil
+      slideshow.should be_a_kind_of Slideshow
+      slideshow.user_id.should_not be_empty
+    end
+  end
+
 end
+
 

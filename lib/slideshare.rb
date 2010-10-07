@@ -1,4 +1,7 @@
-require 'util'
+require 'digest/sha1'
+
+require 'slideshare/net'
+require 'slideshare/model'
 
 module Slideshare
 
@@ -46,19 +49,62 @@ module Slideshare
     #
     # Get Slideshow Information
     #
-    # Required arguments
+    # see http://www.slideshare.net/developers/documentation#get_slideshow for additional documentation
     #
-    #    slideshow_id  => id of the slideshow to be fetched.
-    #    slideshow_url => URL of the slideshow to be fetched. This is required if slideshow_id is not set. If both are set, slideshow_id takes precedence.
+    # Required arguments
+    #    one of:
+    #     slideshow_id  => id of the slideshow to be fetched.
+    #     slideshow_url => URL of the slideshow to be fetched. This is required if slideshow_id is not set. If both are set, slideshow_id takes precedence.
     #
     # Optional arguments
     #
     #    :username => username of the requesting user
     #    :password => password of the requesting user
     #    :exclude_tags => Exclude tags from the detailed information. true to exclude.
-    #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.              
-    def get_slideshow(slideshow_id, slideshow_url, args={})
+    #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+    #
+    # => returns an Slideshare::Slideshow instance
+    def get_slideshow(args={})
+      default_args={
+        :slideshow_id=>nil,
+        :slideshow_url=>nil,
+        :username=>nil,
+        :password=>nil,
+        :exclude_tags=>false,
+        :detailed=>false,
+      }
+      
+      args=default_args.merge args
+      
+      raise ArgumentError.new "One of slideshow_id or slideshow_url must be provided" if args[:slideshow_id].nil? and args[:slideshow_url].nil?
+      raise ArgumentError.new ":exclude_tags must be true or false, but it's #{args[:exclude_tags]}" unless args[:exclude_tags]==true or args[:exclude_tags]==false
+      raise ArgumentError.new ":detailed must be true or false, but it's #{args[:detailed]}" unless args[:detailed]==true or args[:detailed]==false
+      raise ArgumentError.new ":password must be provided for :username=>#{args[:username]}" unless args[:username].nil? or not args[:password].nil?
+      
+      if args[:username].nil? 
+            args.delete :username
+            args.delete :password
+      end
+      
+      args[:exclude_tags] = args[:exclude_tags] ? 1 : 0 
+      args[:detailed] = args[:detailed] ? 1 : 0 
+      
+      discardable_identifier = args[:slideshow_id].nil? ? :slideshow_id : :slideshow_url 
+      args.delete discardable_identifier
+      
+      response=perform_request("get_slideshow",args)
+      Slideshare::Slideshow.from_xml(response)
+    end
     
+    private
+
+    #performs an HTTP request to the given webmethod using the given optional args
+    def perform_request(web_method,args={})
+      ts=Time.now.to_i
+      hash=Digest::SHA1.hexdigest(shared_secret+ts.to_s)
+      args.merge! :api_key=>api_key, :ts=>ts, :hash=>hash
+      url=URL.new web_method, args
+      url.get @proxy
     end
   
   end
