@@ -20,7 +20,7 @@ module Slideshare
 
       
  
-    # Takes an XML document as a string, and extracts certain information from it
+    # Takes an XML document as a string or Nokogiri::XML::Element, and extracts certain information from it
     # adding new properties to the instance being built on the fly.
     #
     # The information to gather from the XML document is pointed by a dictionary
@@ -68,9 +68,9 @@ module Slideshare
     #
     # this instance will also have accessor methods for both id, and title.
     #
-    def from_xml(xml_str)
+    def from_xml(xml_doc)
       instance=self.new
-      xml_doc  = Nokogiri::XML(xml_str)
+      xml_doc  = Nokogiri::XML(xml_doc.to_s) unless xml_doc.kind_of? Nokogiri::XML::Node
       self.extraction_rules.each_pair do |attribute,rule|
         path=rule[0]
         extraction_predicate=rule[1] ||= lambda{|x| x.text}
@@ -81,11 +81,33 @@ module Slideshare
       instance
     end
   end
+
+  #
+  #<Tag>
+  #<Name>{ Tag Name }</Name>
+  #<Count>{ Number of Slideshows }</Count>
+  #<Slideshow>
+  #  { as in get_slideshow }
+  #</Slideshow>
+  #...
+  #</Tag>
+  #
+  class GetSlideshowsByTagResponse
+    include Builder
+
+    def self.extraction_rules
+      {
+        :slideshows =>["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element)}}],
+        :total_number_of_results => ["/Tag/Count",lambda{|node| node.text.to_i}],
+        :tag_searched => ["/Tag/Name"]
+      }
+    end
+  end
    
   
   # Modelles a Slideshow
   #
-  # see http://www.slideshare.net/developers/documentation#get_slideshow
+  # See http://www.slideshare.net/developers/documentation#get_slideshow
   #
   # The following is a the scheme of the XML that describes a Slideshow
   #
@@ -174,14 +196,14 @@ module Slideshare
         :external_app_id         =>["Slideshow/ExternalAppID"],
         :ppt_location            =>["Slideshow/PPTLocation"],
         :stripped_title          =>["Slideshow/StrippedTitle"],
-        :tags                    =>["Slideshow/Tags",lambda {|node| node.xpath("Tag").map{|tag_node| Tag.from_xml(tag_node.to_xml)}}],
+        :tags                    =>["Slideshow/Tags",lambda { |node| node.xpath("Tag").map { |tag_node| Tag.from_xml(tag_node) }}],
         :has_audio               =>["Slideshow/Audio", lambda{|node| node.text.to_i == 1 ? true : false}],
         :num_downloads           =>["Slideshow/NumDownloads", lambda{|node| node.text.to_i}],
         :num_comments            =>["Slideshow/NumComments", lambda{|node| node.text.to_i}],
         :num_views               =>["Slideshow/NumViews", lambda{|node| node.text.to_i}],
         :num_favorites           =>["Slideshow/NumFavorites", lambda{|node| node.text.to_i}],
         :num_slides              =>["Slideshow/NumSlides", lambda{|node| node.text.to_i}],
-        :related_slideshows      =>["Slideshow/RelatedSlideshows",lambda {|node| node.xpath("RelatedSlideshowID").map{|tag_node| RelatedSlideshow.from_xml(tag_node.to_xml)}}],
+        :related_slideshows      =>["Slideshow/RelatedSlideshows",lambda {|node| node.xpath("RelatedSlideshowID").map{|node_set| RelatedSlideshow.from_xml(node_set)}}],
         :is_private              =>["Slideshow/PrivacyLevel", lambda{|node| node.text.to_i == 1 ? true : false}],
         #SS flaw?: what does been flagged as visible exactly mean? why if it's 0 has been flagged.. and otherwise not?
         :is_flagged_as_visible   =>["Slideshow/FlagVisible", lambda{|node| node.text.to_i == 0 ? true : false}],
@@ -259,9 +281,9 @@ module Slideshare
       
     def self.extraction_rules
       {
-        :times_used     =>  ["Tag",lambda{|node| node.attr("Count").value.to_i}],
-        :used_by_owner  =>  ["Tag",lambda{|node| node.attr("Owner").value.to_i == 1 ? true : false}],
-        :name           =>  ["Tag"]
+        :times_used     =>  [".",lambda { |node_set| node_set.first["Count"].to_i }],
+        :used_by_owner  =>  [".",lambda { |node_set| node_set.first["Owner"].to_i == 1 ? true : false}],
+        :name           =>  ["."]
       }
     end
   end
@@ -276,8 +298,8 @@ module Slideshare
 
     def self.extraction_rules
       {
-        :rank =>   ["RelatedSlideshowID",lambda{|node| node.attr("rank").value.to_i}],
-        :slideshow_id   =>   ["RelatedSlideshowID"]
+        :rank           =>   [".",lambda{|node_set| node_set.first["rank"].to_i}],
+        :slideshow_id   =>   ["."]
       }
     end
   end

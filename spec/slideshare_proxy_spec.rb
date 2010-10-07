@@ -5,9 +5,9 @@ include Slideshare
 describe Proxy do
   
   it "should initialize when only proxy_host is provided" do
-   p=Proxy.new "foo.bar.com"
-   p.host.should eql("foo.bar.com")
-   p.port.should eql(8080)
+    p=Proxy.new "foo.bar.com"
+    p.host.should eql("foo.bar.com")
+    p.port.should eql(8080)
   end
   
   it "should fail initialization when proxy_host is not correct" do
@@ -26,11 +26,11 @@ describe Proxy do
   end
   
   it "should initialize when credentiales are provided" do
-      p=Proxy.new "foo.bar.com",8888,"user","pass"
-      p.host.should eql("foo.bar.com")
-      p.port.should eql(8888)
-      p.user.should eql("user")
-      p.password.should eql("pass")
+    p=Proxy.new "foo.bar.com",8888,"user","pass"
+    p.host.should eql("foo.bar.com")
+    p.port.should eql(8888)
+    p.user.should eql("user")
+    p.password.should eql("pass")
   end
   
   it "should fail initialization when username is provided but password is not" do

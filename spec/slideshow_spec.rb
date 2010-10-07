@@ -5,7 +5,7 @@ include Slideshare
 describe Slideshow do
 
   describe "from_xml providing a complete xml document" do
-    before(:each) do
+    before(:all) do
         xml=%q{
            <Slideshow>
             <ID>5229002</ID>

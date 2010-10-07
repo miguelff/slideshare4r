@@ -75,38 +75,75 @@ module Slideshare
       }
       
       args=default_args.merge args
-      
+      args.reject!{|k,v| args[k].nil?}
+
       raise ArgumentError.new "One of slideshow_id or slideshow_url must be provided" if args[:slideshow_id].nil? and args[:slideshow_url].nil?
       raise ArgumentError.new ":exclude_tags must be true or false, but it's #{args[:exclude_tags]}" unless args[:exclude_tags]==true or args[:exclude_tags]==false
-      raise ArgumentError.new ":detailed must be true or false, but it's #{args[:detailed]}" unless args[:detailed]==true or args[:detailed]==false
       raise ArgumentError.new ":password must be provided for :username=>#{args[:username]}" unless args[:username].nil? or not args[:password].nil?
-      
+      raise ArgumentError.new ":detailed must be true or false, but it's #{args[:detailed]}" unless args[:detailed]==true or args[:detailed]==false
+
+     
       if args[:username].nil? 
-            args.delete :username
-            args.delete :password
+        args.delete :password
       end
-      
       args[:exclude_tags] = args[:exclude_tags] ? 1 : 0 
       args[:detailed] = args[:detailed] ? 1 : 0 
       
-      discardable_identifier = args[:slideshow_id].nil? ? :slideshow_id : :slideshow_url 
-      args.delete discardable_identifier
+      
       
       response=perform_request("get_slideshow",args)
       Slideshare::Slideshow.from_xml(response)
     end
-    
-    private
 
-    #performs an HTTP request to the given webmethod using the given optional args
-    def perform_request(web_method,args={})
-      ts=Time.now.to_i
-      hash=Digest::SHA1.hexdigest(shared_secret+ts.to_s)
-      args.merge! :api_key=>api_key, :ts=>ts, :hash=>hash
-      url=URL.new web_method, args
-      url.get @proxy
+  
+    # Get slideshows with a certain tag
+    #
+    # See http://www.slideshare.net/developers/documentation#get_slideshows_by_tag for additional documentation
+    #
+    # Required arguments
+    #     tag  => the tag name
+    #   
+    # Optional arguments
+    #
+    #    :limit => max number of items to return (defaults to 10)
+    #    :offset => 
+    #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+    #
+    # => returns a list of Slideshare::Slideshow instances
+    def get_slideshows_by_tag(args={})
+      default_args={
+        :tag =>nil,
+        :limit =>10,
+        :offset=>nil,
+        :detailed=>false,
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new "Tag must be a string and it's #{args[:tag]}" unless args[:tag].kind_of? String
+      raise ArgumentError.new "Limit must be a number greater than 0 and it's #{args[:limit]}" unless args[:limit].kind_of? Fixnum and args[:limit] > 0
+      raise ArgumentError.new "Offset must be a number greater than 0 and it's #{args[:offset]}" unless args[:offset].nil? or (args[:offset].kind_of? Fixnum and args[:offset] > 0)
+      raise ArgumentError.new ":detailed must be true or false, but it's #{args[:detailed]}" unless args[:detailed]==true or args[:detailed]==false
+
+      args[:detailed] = args[:detailed] ? 1 : 0 
+
+      response=perform_request("get_slideshows_by_tag",args)
+      Slideshare::GetSlideshowsByTagResponse.from_xml(response)
     end
   
+    
+  private
+
+  #performs an HTTP request to the given webmethod using the given optional args
+  def perform_request(web_method,args={})
+    ts=Time.now.to_i
+    hash=Digest::SHA1.hexdigest(shared_secret+ts.to_s)
+    args.merge! :api_key=>api_key, :ts=>ts, :hash=>hash
+    url=URL.new web_method, args
+    url.get @proxy
   end
+  
+end
 
 end

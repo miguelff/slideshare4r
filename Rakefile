@@ -26,6 +26,8 @@ spec = Gem::Specification.new do |s|
   s.files = %w(LICENSE README Rakefile) + Dir.glob("{bin,lib,spec}/**/*")
   s.require_path = "lib"
   s.bindir = "bin"
+  s.add_dependency('nokogiri', '>= 1.4.3.1')
+  s.requirements << 'nokogiri v1.4.3.1 or greater'
 end
 
 Rake::GemPackageTask.new(spec) do |p|
