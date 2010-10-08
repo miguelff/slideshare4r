@@ -2,14 +2,14 @@ require 'slideshare/model'
 
 include Slideshare
 
-describe GetSlideshowsByTagResponse do
+describe GetSlideshowsByGroupResponse do
 
   describe "from_xml providing a complete an xml document with just one slideshow definition" do
     before(:each) do
         xml=%q{
-          <Tag>
+          <Group>
            <Count>12344</Count>
-           <Name>tag</Name>
+           <Name>group</Name>
            <Slideshow>
             <ID>5229002</ID>
             <Title>Real time</Title>
@@ -64,28 +64,28 @@ describe GetSlideshowsByTagResponse do
             <AllowEmbed>0</AllowEmbed>
             <ShareWithContacts>0</ShareWithContacts>
           </Slideshow>
-        </Tag>
+        </Group>
           }
-      @response=GetSlideshowsByTagResponse.from_xml xml
+      @response=GetSlideshowsByGroupResponse.from_xml xml
     end
 
     it "invoking :slideshows returns a list with one slideshow " do
       @response.slideshows.count.should == 1
     end
 
-    it "items single item is an Slideshow " do
+    it "slideshows single item is an Slideshow " do
       @response.slideshows.first.should be_kind_of Slideshow
     end
 
-   
+
   end
 
     describe "from_xml providing a complete an xml document with two slideshow definition" do
     before(:each) do
         xml=%q{
-           <Tag>
+           <Group>
            <Count>12344</Count>
-           <Name>tag</Name>
+           <Name>group</Name>
            <Slideshow>
             <ID>5229002</ID>
             <Title>Real time</Title>
@@ -195,9 +195,9 @@ describe GetSlideshowsByTagResponse do
             <AllowEmbed>0</AllowEmbed>
             <ShareWithContacts>0</ShareWithContacts>
           </Slideshow>
-        </Tag>
+        </Group>
           }
-      @response=GetSlideshowsByTagResponse.from_xml xml
+      @response=GetSlideshowsByGroupResponse.from_xml xml
     end
 
     it "invoking :slideshows returns a list with two slideshows " do
@@ -215,7 +215,7 @@ describe GetSlideshowsByTagResponse do
     end
 
      it "must retrieve the name of the tag searched of results" do
-       @response.tag_searched.should == "tag"
+       @response.group_searched.should == "group"
     end
   end
 
