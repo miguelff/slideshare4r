@@ -108,11 +108,115 @@ module Slideshare
 
     def self.extraction_rules
       {
-        :slideshows =>["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element)}}],
-        :total_number_of_results => ["/Tag/Count",lambda{|node| node.text.to_i}],
-        :tag_searched => ["/Tag/Name"]
+        :slideshows               =>["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element)}}],
+        :total_number_of_results  => ["/Tag/Count",lambda{|node| node.text.to_i}],
+        :tag_searched             => ["/Tag/Name"]
       }
     end
+  end
+
+  # Modelles the response of API#get_slideshows_by_group method
+  #
+  # The following is the structure  of the XML returned by the API web method,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #<Group>
+  #<Name>{ Tag Name }</Name>
+  #<Count>{ Number of Slideshows }</Count>
+  #<Slideshow>
+  #  { as in get_slideshow }
+  #</Slideshow>
+  #...
+  #</Group>
+  #
+  # An instance of GetSlideshowsByGroupResponse has the following properties:
+  #
+  # slideshows => A list of Slideshow instances tagged with the string used to make the search
+  # total_number_of_results => The total number of slideshows on slideshare that are tagged with the string searched
+  # group_searched => the string used to search a list of the slideshows tagged with it.
+  #
+  class GetSlideshowsByGroupResponse
+    include Builder
+
+    def self.extraction_rules
+      {
+        :slideshows              =>["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element)}}],
+        :total_number_of_results => ["/Group/Count",lambda{|node| node.text.to_i}],
+        :group_searched          => ["/Group/Name"]
+      }
+    end
+  end
+
+
+  # Modelles a Group
+  #
+  # The following is the structure  of the XML returned by the API web method,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #  <Group>
+  #  <Name>{ Group Name }</Name>
+  #  <NumPosts>{ Number of Posts }</NumPosts>
+  #  <NumSlideshows>{ Number of Slideshows }</NumSlideshows>
+  #  <NumMembers>{ Number of Members }</NumMembers>
+  #  <Created>{ Created date }</Created>
+  #  <QueryName>{ Name used for querying (get_slideshows_by_group, etc) }</QueryName>
+  #  <URL>{ Group URL }</URL>
+  # <Group>
+  #
+  # An instance of group has the following properties:
+  #
+  # :name => the group name
+  # :num_posts => number of posts published on this group
+  # :num_slideshows => number of slideshows belonging to this group
+  # :num_members => number of members of this groups
+  # :created => a DateTime object indicating when the group was created
+  # :query_name => a string used to make other queries (get_slideshows_by_group, etc)
+  # :url => url of the group
+  #
+  class Group
+    include Builder
+
+    def self.extraction_rules
+      {
+        :name           => ["Group/Name"],
+        :num_posts      => ["Group/NumPosts",lambda{|node| node.text.to_i}],
+        :num_slideshows => ["Group/NumSlideshows",lambda{|node| node.text.to_i}],
+        :num_members    => ["Group/NumMembers",lambda{|node| node.text.to_i}],
+        :created        => ["Group/Created", lambda{|node| DateUtil::parse(node.text)}],
+        :query_name     => ["Group/QueryName"],
+        :url            => ["Group/URL"]
+      }
+    end
+
+  end
+
+  # Modelles a list of groups
+  #
+  # The following is the structure  of the XML that represents a list of groups,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #<Groups>
+  #<Group>
+  #...
+  #</Group>
+  #<Group>
+  #...
+  #</Group>
+  #</Groups>
+  #
+  # An instance of GroupList has the following properties:
+  #
+  # items => a list of group instances
+  #
+  class GroupList
+    include Builder
+
+    def self.extraction_rules
+      {
+        :items =>["//Group",lambda{|nodeset| nodeset.map{|element| Group.from_xml(element)}}],
+      }
+    end
+    
   end
    
   

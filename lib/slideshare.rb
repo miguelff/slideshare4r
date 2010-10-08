@@ -63,7 +63,7 @@ module Slideshare
     #    :exclude_tags => Exclude tags from the detailed information. true to exclude.
     #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
     #
-    # => returns an Slideshare::Slideshow instance
+    # returns an Slideshare::Slideshow instance
     def get_slideshow(args={})
       usage=%q{
       Gets Slideshow Information
@@ -82,7 +82,7 @@ module Slideshare
         :exclude_tags => Exclude tags from the detailed information. true to exclude.
         :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
 
-      => returns an Slideshare::Slideshow instance
+      returns an Slideshare::Slideshow instance
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
 
@@ -98,19 +98,16 @@ module Slideshare
       args=default_args.merge args
       args.reject!{|k,v| args[k].nil?}
 
-      raise ArgumentError.new "One of slideshow_id or slideshow_url must be provided" if args[:slideshow_id].nil? and args[:slideshow_url].nil?
+      raise ArgumentError.new "One of :slideshow_id or :slideshow_url must be provided" if args[:slideshow_id].nil? and args[:slideshow_url].nil?
       raise ArgumentError.new ":exclude_tags must be true or false, but it's #{args[:exclude_tags]}" unless args[:exclude_tags]==true or args[:exclude_tags]==false
       raise ArgumentError.new ":password must be provided for :username=>#{args[:username]}" unless args[:username].nil? or not args[:password].nil?
       raise ArgumentError.new ":detailed must be true or false, but it's #{args[:detailed]}" unless args[:detailed]==true or args[:detailed]==false
 
-     
       if args[:username].nil? 
         args.delete :password
       end
       args[:exclude_tags] = args[:exclude_tags] ? 1 : 0 
       args[:detailed] = args[:detailed] ? 1 : 0 
-      
-      
       
       response=perform_request("get_slideshow",args)
       Slideshare::Slideshow.from_xml(response)
@@ -127,10 +124,10 @@ module Slideshare
     # Optional arguments
     #
     #    :limit => max number of items to return (defaults to 10)
-    #    :offset => 
+    #    :offset => the number of slides to skip, before returning results.
     #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
     #
-    # => returns a GetSlideshowsByTagResponse instance
+    #  returns a GetSlideshowsByTagResponse instance
     def get_slideshows_by_tag(args={})
       usage=%q{
        Get slideshows with a certain tag
@@ -143,10 +140,10 @@ module Slideshare
        Optional arguments
 
           :limit => max number of items to return (defaults to 10)
-          :offset =>
+          :offset => the number of slides to skip, before returning results.
           :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
 
-       => returns a GetSlideshowsByTagResponse instance
+       returns a GetSlideshowsByTagResponse instance
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
       default_args={
@@ -159,9 +156,9 @@ module Slideshare
       args=default_args.merge args
       args.reject!{|k,v| args[k].nil?}
 
-      raise ArgumentError.new "Tag must be a string and it's #{args[:tag]}" unless args[:tag].kind_of? String
-      raise ArgumentError.new "Limit must be a number greater than 0 and it's #{args[:limit]}" unless args[:limit].kind_of? Fixnum and args[:limit] > 0
-      raise ArgumentError.new "Offset must be a number greater than 0 and it's #{args[:offset]}" unless args[:offset].nil? or (args[:offset].kind_of? Fixnum and args[:offset] > 0)
+      raise ArgumentError.new ":tag must be a string and it's #{args[:tag]}" unless args[:tag].kind_of? String
+      raise ArgumentError.new ":limit must be a number greater than 0 and it's #{args[:limit]}" unless args[:limit].kind_of? Fixnum and args[:limit] > 0
+      raise ArgumentError.new ":offset must be a number greater than 0 and it's #{args[:offset]}" unless args[:offset].nil? or (args[:offset].kind_of? Fixnum and args[:offset] > 0)
       raise ArgumentError.new ":detailed must be true or false, but it's #{args[:detailed]}" unless args[:detailed]==true or args[:detailed]==false
 
       args[:detailed] = args[:detailed] ? 1 : 0 
@@ -169,7 +166,111 @@ module Slideshare
       response=perform_request("get_slideshows_by_tag",args)
       Slideshare::GetSlideshowsByTagResponse.from_xml(response)
     end
-  
+
+    # Gets the groups a user belongs to
+    #
+    # See http://www.slideshare.net/developers/documentation#get_slideshows_by_tag for additional documentation
+    #
+    # Required arguments
+    #
+    #    :username_for => name of user whose groups are being requested
+    #
+    # Optional arguments
+    #
+    #    :username => username of the requesting user
+    #    :password => password of the requesting user
+    #
+    # returns a list of Group instances
+    #
+    def get_user_groups(args={})
+      usage=%q{
+         Gets the groups a user belongs to
+
+         See http://www.slideshare.net/developers/documentation#get_slideshows_by_tag for additional documentation
+
+         Required arguments
+
+            :username_for => name of user whose groups are being requested
+
+         Optional arguments
+
+            :username => username of the requesting user
+            :password => password of the requesting user
+
+         returns a list of Group instances
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+
+       default_args={
+        :username_for =>nil,
+        :username=>nil,
+        :password=>nil,
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":username_for must be a string and it's #{args[:username_for]}" unless args[:username_for].kind_of? String
+      raise ArgumentError.new ":password must be provided for :username=>#{args[:username]}" unless args[:username].nil? or not args[:password].nil?
+
+      response=perform_request("get_user_groups",args)
+      Slideshare::GroupList.from_xml(response).items
+    end
+
+    
+
+    # Gets slideshows beonging to a certain user group.
+    #
+    # See http://www.slideshare.net/developers/documentation#get_slideshows_by_group for additional documentation
+    #
+    # Required arguments
+    #     :group_name => Group name (as returned in :query_name in any of the elements returned by get_user_groups method)
+    #
+    # Optional arguments
+    #
+    #    :limit => max number of items to return (defaults to 10)
+    #    :offset => the number of slides to skip, before returning results.
+    #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+    #
+    # returns a GetSlideshowsByGroupResponse instance
+    def get_slideshows_by_group(args={})
+      usage=%q{
+       Gets slideshows beonging to a certain user group.
+
+       See http://www.slideshare.net/developers/documentation#get_slideshows_by_group for additional documentation
+
+       Required arguments
+           :group_name => Group name (as returned in :group_name element in get_user_groups method)
+
+       Optional arguments
+
+          :limit => max number of items to return (defaults to 10)
+          :offset => the number of slides to skip, before returning results.
+          :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+
+       returns a GetSlideshowsByGroupResponse instance
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+      default_args={
+        :group_name =>nil,
+        :limit =>10,
+        :offset=>nil,
+        :detailed=>false,
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":group_name must be a string and it's #{args[:group_name]}" unless args[:group_name].kind_of? String
+      raise ArgumentError.new ":limit must be a number greater than 0 and it's #{args[:limit]}" unless args[:limit].kind_of? Fixnum and args[:limit] > 0
+      raise ArgumentError.new ":offset must be a number greater than 0 and it's #{args[:offset]}" unless args[:offset].nil? or (args[:offset].kind_of? Fixnum and args[:offset] > 0)
+      raise ArgumentError.new ":detailed must be true or false, but it's #{args[:detailed]}" unless args[:detailed]==true or args[:detailed]==false
+
+      args[:detailed] = args[:detailed] ? 1 : 0
+
+      response=perform_request("get_slideshows_by_group",args)
+      Slideshare::GetSlideshowsByGroupResponse.from_xml(response)
+    end
     
   private
 
@@ -179,6 +280,7 @@ module Slideshare
     hash=Digest::SHA1.hexdigest(shared_secret+ts.to_s)
     args.merge! :api_key=>api_key, :ts=>ts, :hash=>hash
     url=URL.new web_method, args
+    puts "\n\n#{url}\n\n" if (web_method=="get_slideshows_by_group")
     url.get @proxy
   end
   
