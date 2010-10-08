@@ -4,9 +4,9 @@ require 'date'
 
 module Slideshare 
     
-  #
-  # Classes that include this module, extend its eigenclass interface
-  # by adding from_xml(xml_str) method, which builds a new instance of the
+  
+  # Classes that include this module, extend its eigenclass by adding
+  # from_xml(xml_str) method, which builds a new instance of the
   # class extended by unmarshalling the XML document provided.
   #
   module Builder
@@ -20,8 +20,9 @@ module Slideshare
 
       
  
-    # Takes an XML document as a string or Nokogiri::XML::Element, and extracts certain information from it
-    # adding new properties to the instance being built on the fly.
+    # Takes an XML document as a string or Nokogiri::XML::Element, and extracts
+    # certain information from it adding new properties to the instance
+    # being built on the fly.
     #
     # The information to gather from the XML document is pointed by a dictionary
     # returned by self.extraction_rules method, which is defined in each of the classes
@@ -82,6 +83,10 @@ module Slideshare
     end
   end
 
+  # Modelles the response of API#get_slideshows_by_tag method
+  #
+  # The following is the structure  of the XML returned by the API web method,
+  # which will be unmarshalled into an instance of this class.
   #
   #<Tag>
   #<Name>{ Tag Name }</Name>
@@ -91,6 +96,12 @@ module Slideshare
   #</Slideshow>
   #...
   #</Tag>
+  #
+  # An instance of GetSlideshowsByTagResponse has the following properties:
+  #
+  # slideshows => A list of Slideshow instances tagged with the string used to make the search
+  # total_number_of_results => The total number of slideshows on slideshare that are tagged with the string searched
+  # tag_searched => the string used to search a list of the slideshows tagged with it.
   #
   class GetSlideshowsByTagResponse
     include Builder
@@ -109,7 +120,7 @@ module Slideshare
   #
   # See http://www.slideshare.net/developers/documentation#get_slideshow
   #
-  # The following is a the scheme of the XML that describes a Slideshow
+  # The following is a the structure of the XML that describes a Slideshow
   #
   # <Slideshow>
   #   <ID>{ slideshow id }</ID>
@@ -164,9 +175,45 @@ module Slideshare
   #   </ShareWithContacts>
   # </Slideshow>
   #
-  # This document is unmarshalled, using the following rules
-  # returned by Slideshow.extraction_rules method
-  # (see Builder::from_xml for more information)
+  # This kind of document is unmarshalled into an instance of Slideshow that will
+  # have the following properties:
+  #
+  # slideshow_id  => the ID of the slideshow
+  # title => its title
+  # description => its description
+  # status => an instance of SlideshowStatus indicating the status of the slideshow
+  # username => the username of the owner of the slideshow
+  # url => a string representing the URL of the slideshow on slideshare
+  # thumbnail_url => a string representing the URL of an image that shows the cover of the slideshow
+  # thumbnail_small_url => a string representing the URL of an image that shows the cover of the slideshow (a smaller one)
+  # embed => HTML markup to embed the slideshow
+  # created => a DateTime object that represents when the slideshow was created
+  # updated => a DateTime object that represents when the slideshow was last updated
+  # language => a two letter code indicating the language of the slideshow (en, es, ru, ...)
+  # format => a string representing the format of the slideshow (pdf, ppt,...)
+  # is_downloadable => true if the slideshow can be downloadable, false otherwise
+  # download_url => a String rerpresenting the URL for downloading the slideshow
+  # slideshow_type => an instance of SlideshowType indicating the type of document (document, presentation, portfolio, video...)
+  # is_in_contest => true if the presentation is in context; false otherwise
+  # user_id => the ID of the owner of the slideshow
+  # external_app_user_id => external app user identifier if the slideshow has been uploaded using an external application
+  # external_app_id => external app identifier if the slideshow has been uploaded using an external application
+  # ppt_location => the location of the ppt in the server. (although is returned by the API web method, I can't guess what can it be useful for. I'd rather use download_url for downloading purposes instead)
+  # stripped_title => a stripped version of the title, if the title is too verbose.
+  # tags => a list of Tag instances, each instance has the string used to tag this slideshow (:name), the number of times this tag has been used (:times_used) and if the tag has been previously used by its owner (:used_by_owner)
+  # has_audio => true if the slideshow has audio; false otherwise
+  # num_downloads => times the slideshow has been downloaded
+  # num_comments => the number of comments of this slideshow
+  # num_views => times this slideshow has been viewed
+  # num_favorites => times that this slideshow has been favorited
+  # num_slides => number of slides
+  # related_slideshows => a list of RelatedSlideshow instance. Each instance contains the id of the slideshow (:slideshow_id) and the rank (:rank)
+  # is_private => true if the slideshow is private; false otherwise
+  # is_flagged_as_visible => true if the slideshow is flagged as visible; false otherwise
+  # is_shown_on_slideshare => true if the slideshow is shown on slideshare; false otherwise
+  # is_secret_url_enabled => true if Secret URL is enabled; false otherwise
+  # is_embed_allowed => true if the slideshow can be embedable using the code returned by :embed; false otherwise
+  # is_only_shared_with_contacts => true if the slideshow can only be seen by its owner's contacts; false if it's public
   #
   class Slideshow
     
@@ -217,6 +264,23 @@ module Slideshare
   end
     
   # modelles the status of a slideshow
+  #
+  # it has several constants, which are instances of this same class.
+  #
+  # QUEUED => indicates that the slideshow has been queued for convertion
+  # CONVERTING => the slideshow is being converted.
+  # CONVERTED => the slideshow has already been converted.
+  # CONVERSION_FAILED => the conversion of the slideshow has been failed
+  #
+  # each instance has the following properties
+  #
+  # code => a numeric code for the status (returned by the web method)
+  # description => a short, textual description of the status
+  #
+  # an extra constant is defined:
+  #
+  # STATUSES => is a dictionary that lets you access the status described above
+  # from their numeric code.
   class SlideshowStatus
       
     attr_reader :code,:description
@@ -242,7 +306,25 @@ module Slideshare
     STATUSES={0=>QUEUED,1=>CONVERTING,2=>CONVERTED,3=>CONVERSION_FAILED}
   end
     
-  # modelles the status of a slideshow
+  # modelles the type of a slideshow
+  #
+  # it has several constants, which are instances of this same class.
+  #
+  # PRESENTATION => indicates that the slideshow is a presentation
+  # DOCUMENT => the slideshow is a document
+  # PORTFOLIO => the slideshow is a portfolio
+  # VIDEO => the slideshow is a video
+  #
+  # each instance has the following properties
+  #
+  # code => a numeric code for the type (returned by the web method)
+  # description => a short, textual description of the type
+  #
+  # an extra constant is defined:
+  #
+  # TYPES => is a dictionary that lets you access the types described above
+  # from their numeric code.
+  #
   class SlideshowType
       
     attr_reader :code,:description
@@ -274,7 +356,11 @@ module Slideshare
   #
   #    <Tag Count="{ number of times tag has been used }" Owner="{ 1 if owner
   #                 has used the tag, else 0 }">{ tag name }
-  #   </Tag>
+  #    </Tag>
+  #
+  # Each instance has the string used to tag this slideshow (:name),
+  # the number of times this tag has been used (:times_used)
+  # and if the tag has been previously used by its owner (:used_by_owner)
   class Tag
       
     include Builder
@@ -292,6 +378,10 @@ module Slideshare
   #
   #  <RelatedSlideshowID rank="{ rank, where 1 is highest}">
   #     { slideshow id } </RelatedSlideshowID>
+  #
+  # Instances of this class encapsulate the id of the slideshow
+  # (:slideshow_id) and its rank among the rest of the relates slideshows
+  # (:rank)
   class RelatedSlideshow
 
     include Builder
@@ -305,6 +395,7 @@ module Slideshare
   end
 
 
+  #Contains utility methods for working with dates and their string representations.
   module DateUtil
     #parses a date in the following format "Sat Sep 18 08:09:00 -0500 2010"
     #returns nil if the string to parse is nil or empty

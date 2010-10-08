@@ -47,7 +47,7 @@ module Slideshare
     end
   
     #
-    # Get Slideshow Information
+    # Gets Slideshow Information
     #
     # see http://www.slideshare.net/developers/documentation#get_slideshow for additional documentation
     #
@@ -65,6 +65,27 @@ module Slideshare
     #
     # => returns an Slideshare::Slideshow instance
     def get_slideshow(args={})
+      usage=%q{
+      Gets Slideshow Information
+
+      see http://www.slideshare.net/developers/documentation#get_slideshow for additional documentation
+
+      Required arguments
+        one of:
+         :slideshow_id  => id of the slideshow to be fetched.
+         :slideshow_url => URL of the slideshow to be fetched. This is required if slideshow_id is not set. If both are set, slideshow_id takes precedence.
+
+      Optional arguments
+
+        :username => username of the requesting user
+        :password => password of the requesting user
+        :exclude_tags => Exclude tags from the detailed information. true to exclude.
+        :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+
+      => returns an Slideshare::Slideshow instance
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+
       default_args={
         :slideshow_id=>nil,
         :slideshow_url=>nil,
@@ -101,7 +122,7 @@ module Slideshare
     # See http://www.slideshare.net/developers/documentation#get_slideshows_by_tag for additional documentation
     #
     # Required arguments
-    #     tag  => the tag name
+    #     :tag  => the tag name
     #   
     # Optional arguments
     #
@@ -109,8 +130,25 @@ module Slideshare
     #    :offset => 
     #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
     #
-    # => returns a list of Slideshare::Slideshow instances
+    # => returns a GetSlideshowsByTagResponse instance
     def get_slideshows_by_tag(args={})
+      usage=%q{
+       Get slideshows with a certain tag
+
+       See http://www.slideshare.net/developers/documentation#get_slideshows_by_tag for additional documentation
+
+       Required arguments
+          :tag  => the tag name
+
+       Optional arguments
+
+          :limit => max number of items to return (defaults to 10)
+          :offset =>
+          :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+
+       => returns a GetSlideshowsByTagResponse instance
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
       default_args={
         :tag =>nil,
         :limit =>10,
