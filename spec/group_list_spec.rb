@@ -1,5 +1,7 @@
 require 'slideshare/model'
 
+include Slideshare
+
 describe GroupList do
 
   describe "from_xml providing a complete an xml document with just one Group definition" do

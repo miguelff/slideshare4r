@@ -1,5 +1,7 @@
 require 'slideshare/model'
 
+include Slideshare
+
 describe Group do
 
   describe "from_xml providing a complete xml document" do

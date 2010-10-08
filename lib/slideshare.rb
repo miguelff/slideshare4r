@@ -219,7 +219,7 @@ module Slideshare
 
     
 
-    # Gets slideshows beonging to a certain user group.
+    # Gets slideshows beonging to a certain group.
     #
     # See http://www.slideshare.net/developers/documentation#get_slideshows_by_group for additional documentation
     #
@@ -271,6 +271,66 @@ module Slideshare
       response=perform_request("get_slideshows_by_group",args)
       Slideshare::GetSlideshowsByGroupResponse.from_xml(response)
     end
+
+    # Gets slideshows beonging to a certain user.
+    #
+    # See http://www.slideshare.net/developers/documentation#get_slideshows_by_user for additional documentation
+    #
+    # Required arguments
+    #    :username_for => name of user whose groups are being requested
+    #
+    # Optional arguments
+    #
+    #    :limit => max number of items to return (defaults to 10)
+    #    :offset => the number of slides to skip, before returning results.
+    #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+    #    :username => username of the requesting user
+    #    :password => password of the requesting user
+    #
+    # returns a GetSlideshowsByUserResponse instance
+    def get_slideshows_by_user(args={})
+      usage=%q{
+       Gets slideshows beonging to a certain user.
+
+       See http://www.slideshare.net/developers/documentation#get_slideshows_by_user for additional documentation
+
+       Required arguments
+          :username_for => name of user whose groups are being requested
+
+       Optional arguments
+
+          :limit => max number of items to return (defaults to 10)
+          :offset => the number of slides to skip, before returning results.
+          :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+          :username => username of the requesting user
+          :password => password of the requesting user
+
+       returns a GetSlideshowsByUserResponse instance
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+      default_args={
+        :username_for =>nil,
+        :limit =>10,
+        :offset=>nil,
+        :detailed=>false,
+        :username=>nil,
+        :password=>nil
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":username_for must be a string and it's #{args[:username_for]}" unless args[:username_for].kind_of? String
+      raise ArgumentError.new ":password must be provided for :username=>#{args[:username]}" unless args[:username].nil? or not args[:password].nil?
+      raise ArgumentError.new ":limit must be a number greater than 0 and it's #{args[:limit]}" unless args[:limit].kind_of? Fixnum and args[:limit] > 0
+      raise ArgumentError.new ":offset must be a number greater than 0 and it's #{args[:offset]}" unless args[:offset].nil? or (args[:offset].kind_of? Fixnum and args[:offset] > 0)
+      raise ArgumentError.new ":detailed must be true or false, but it's #{args[:detailed]}" unless args[:detailed]==true or args[:detailed]==false
+
+      args[:detailed] = args[:detailed] ? 1 : 0
+
+      response=perform_request("get_slideshows_by_user",args)
+      Slideshare::GetSlideshowsByUserResponse.from_xml(response)
+    end
     
   private
 
@@ -280,7 +340,7 @@ module Slideshare
     hash=Digest::SHA1.hexdigest(shared_secret+ts.to_s)
     args.merge! :api_key=>api_key, :ts=>ts, :hash=>hash
     url=URL.new web_method, args
-    puts "\n\n#{url}\n\n" if (web_method=="get_slideshows_by_group")
+    #puts "\n\n#{url}\n\n" if web_method == "get_slideshows_by_user"
     url.get @proxy
   end
   
