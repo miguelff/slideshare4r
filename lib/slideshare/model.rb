@@ -163,9 +163,9 @@ module Slideshare
   #
   # An instance of GetSlideshowsByUserResponse has the following properties:
   #
-  # slideshows => A list of Slideshow instances that belong to the user
-  # total_number_of_results => The total number of slideshows on slideshare that belong to the user
-  # user_searched => the string used to search a list of the slideshows tagged with it.
+  # :slideshows => A list of Slideshow instances that belong to the user
+  # :total_number_of_results => The total number of slideshows on slideshare that belong to the user
+  # :user_searched => the string used to search a list of the slideshows tagged with it.
   #
   class GetSlideshowsByUserResponse
     include Builder
@@ -252,7 +252,45 @@ module Slideshare
     end
     
   end
-   
+
+  # Modelles the result of searching for slideshows
+  #
+  # The following is the XML structure of the search results, which will
+  # be unmarshalled into an instance of this class
+  #
+  #<Slideshows>
+  #<Meta>
+  #<Query>{ query }</Query>
+  #<ResultOffset>{ the offset of this result (if pages were used)}
+  #</ResultOffset>
+  #<NumResults>{ number of results returned }</NumResults>
+  #<TotalResults>{ total number of results}</TotalResults>
+  #</Meta>
+  #<Slideshow>
+  #{as in get_slideshow}
+  #</Slideshow>
+  #...
+  #</Slideshows>
+  #
+  # An instance of SearchResults contains the following properties
+  #
+  # :items => a list of the slideshows matching the query. Each element is an Slideshow instance
+  # :query => the query performed
+  # :result_offset => if present the offset of the result (if pages used)
+  # :total_number_of_results => the total number of results that match the query
+  #
+  class SearchResults
+    include Builder
+    def self.extraction_rules
+      {
+        :items                 => ["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element)}}],
+        :query                   => ["/Slideshows/Meta/Query"],
+        :result_offset           => ["/Slideshows/Meta/ResultOffset",lambda{|node| node.text.to_i}],
+        :total_number_of_results => ["/Slideshows/Meta/TotalResults",lambda{|node| node.text.to_i}]
+      }
+    end
+  end
+
   
   # Modelles a Slideshow
   #

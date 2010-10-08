@@ -28,18 +28,18 @@ describe URL do
     def api_url.url
       URI.parse("http://www.w3.org/robots.txt")
     end
-    api_url.get(Proxy.new Config::PROXY_HOST,Config::PROXY_PORT).should_not be_nil
-    #api_url.get.should_not be_nil
+    (api_url.get(Proxy.new Config::PROXY_HOST,Config::PROXY_PORT).should_not be_nil) if Config::PROXY_HOST
+    (api_url.get.should_not be_nil) unless Config::PROXY_HOST
   end
    
-  it "should failed retrieving content when get is performed without proxy" do
+  it "should failed retrieving content when get is performed against a wrong URL" do
     api_url=URL.new("path")
     #we hack the url to test fetching functionality
     def api_url.url
       URI.parse("http://xxxxxxxxxxxxxxx.xxx/")
     end
-    lambda{api_url.get(Proxy.new Config::PROXY_HOST,Config::PROXY_PORT)}.should raise_error(HTTPError)
-    #lambda{api_url.get}.should raise_error(HTTPError)
+    (lambda{api_url.get(Proxy.new Config::PROXY_HOST,Config::PROXY_PORT)}.should raise_error(HTTPError)) if Config::PROXY_HOST
+    (lambda{api_url.get}.should raise_error) unless Config::PROXY_HOST
   end
 
   

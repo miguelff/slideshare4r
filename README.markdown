@@ -10,8 +10,8 @@ Take a look at [lib/slideshare.rb](http://github.com/miguelff/slideshare4r/blob/
 * [get_slideshow](http://www.slideshare.net/developers/documentation#get_slideshow)		-> COMPLETED
 * [get_slideshows_by_tag](http://www.slideshare.net/developers/documentation#get_slideshows_by_tag) 	-> COMPLETED
 * [get_slideshows_by_group](http://www.slideshare.net/developers/documentation#get_slideshows_by_group)	-> COMPLETED
-* [get_slideshows_by_user](http://www.slideshare.net/developers/documentation#get_slideshows_by_user)	-> IN_PROGRESS
-* [search_slideshows](http://www.slideshare.net/developers/documentation#search_slideshows)		-> PENDING
+* [get_slideshows_by_user](http://www.slideshare.net/developers/documentation#get_slideshows_by_user)	-> COMPLETED
+* [search_slideshows](http://www.slideshare.net/developers/documentation#search_slideshows)		-> COMPLETED
 * [get_user_groups](http://www.slideshare.net/developers/documentation#get_user_groups)		-> COMPLETED
 * [get_user_contacts](http://www.slideshare.net/developers/documentation#get_user_contacts)		-> PENDING
 * [get_user_tags](http://www.slideshare.net/developers/documentation#get_user_tags)		-> PENDING

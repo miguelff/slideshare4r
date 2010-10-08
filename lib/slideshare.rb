@@ -281,7 +281,7 @@ module Slideshare
     #
     # Optional arguments
     #
-    #    :limit => max number of items to return (defaults to 10)
+    #    :limit => max number of items to return (defaults to 12)
     #    :offset => the number of slides to skip, before returning results.
     #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
     #    :username => username of the requesting user
@@ -310,7 +310,7 @@ module Slideshare
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
       default_args={
         :username_for =>nil,
-        :limit =>10,
+        :limit =>12,
         :offset=>nil,
         :detailed=>false,
         :username=>nil,
@@ -330,6 +330,118 @@ module Slideshare
 
       response=perform_request("get_slideshows_by_user",args)
       Slideshare::GetSlideshowsByUserResponse.from_xml(response)
+    end
+
+
+    # Performs a search for slideshows
+    #
+    # See http://www.slideshare.net/developers/documentation#search_slideshows for additional documentation
+    #
+    #  Required parameters
+    #     
+    #    :q => the query string
+    #
+    #  Optional parameters
+    #   
+    #   :page => The page number of the results (works in conjunction with items_per_page), default is 1
+    #   :items_per_page => Number of results to return per page, default is 12
+    #   :lang => Language of slideshows (default is English, 'en') ('**':All,'es':Spanish,'pt':Portuguese,'fr':French,'it':Italian,'nl':Dutch, 'de':German,'zh':Chinese,'ja':Japanese,'ko':Korean,'ro':Romanian, '!!':Other)
+    #   :sort => Sort order (default is :relevance) (:mostviewed,:mostdownloaded,:latest)
+    #   :upload_date => The time period you want to restrict your search to. :week would restrict to the last week. (default is :any) (:week, :month, :year)
+    #   :search_in_tags_only => Set to 'true' if you want to search only in tags. Defaults to 'false' (search in every field)
+    #   :restrict_to_downloadables= > Set to 'true' if you want to search only for downloadable content. Defaults to 'false'.
+    #   :fileformat => File format to search for. Default is :all (:pdf, :ppt, :odp (Open Office) :pps (PowerPoint Slideshow) :pot (PowerPoint template))
+    #   :file_type => File type to search for. Default is :all. (:presentations, :documents, :webinars,:videos)
+    #   :restrict_to_cc => Set to 'true' to only retrieve results under the Creative Commons license.
+    #   :restrict_to_cc_adapt => Set to 'true' to restrict the retrieval to results under Creative Commons that allow adaption or modification. Defaults to 'false'
+    #   :restrict_to_cc_commercial => Set to 'true' to restrict the retrieval to results under commercial Creative Commons license. Defaults to 'false'
+    #   :detailed => Whether or not to include optional information. 'true' to include, 'false' (default) for basic information.
+    #
+    # returns => an instance of SearchResults
+    def search_slideshows(args={})
+      usage=%q{
+     Performs a search for slideshows
+
+     See http://www.slideshare.net/developers/documentation#search_slideshows for additional documentation
+
+     Required parameters
+
+        :q => the query string
+
+     Optional parameters
+
+       :page => The page number of the results (works in conjunction with items_per_page), default is 1
+       :items_per_page => Number of results to return per page, default is 12
+       :lang => Language of slideshows (default is English, 'en') ('**':All,'es':Spanish,'pt':Portuguese,'fr':French,'it':Italian,'nl':Dutch, 'de':German,'zh':Chinese,'ja':Japanese,'ko':Korean,'ro':Romanian, '!!':Other)
+       :sort => Sort order (default is :relevance) (:mostviewed,:mostdownloaded,:latest)
+       :upload_date => The time period you want to restrict your search to. :week would restrict to the last week. (default is :any) (:week, :month, :year)
+       :search_in_tags_only => Set to 'true' if you want to search only in tags. Defaults to 'false' (search in every field)
+       :restrict_to_downloadables= > Set to 'true' if you want to search only for downloadable content. Defaults to 'false'.
+       :fileformat => File format to search for. Default is :all (:pdf, :ppt, :odp (Open Office) :pps (PowerPoint Slideshow) :pot (PowerPoint template))
+       :file_type => File type to search for. Default is :all. (:presentations, :documents, :webinars,:videos)
+       :restrict_to_cc => Set to 'true' to only retrieve results under the Creative Commons license.
+       :restrict_to_cc_adapt => Set to 'true' to restrict the retrieval to results under Creative Commons that allow adaption or modification. Defaults to 'false'
+       :restrict_to_cc_commercial => Set to 'true' to restrict the retrieval to results under commercial Creative Commons license. Defaults to 'false'
+       :detailed => Whether or not to include optional information. 'true' to include, 'false' (default) for basic information.
+
+      returns => an instance of SearchResults
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+      default_args={
+        :q => nil,
+        :page => 1,
+        :items_per_page => 12,
+        :lang=>:en,
+        :sort=>:relevance,
+        :upload_date=>:any,
+        :search_in_tags_only => false,
+        :restrict_to_downloadables=>false,
+        :file_format=>:all,
+        :file_type=>:all,
+        :restrict_to_cc => false,
+        :restrict_to_cc_adapt => false,
+        :restrict_to_cc_commercial => false,
+        :detailed=> false
+      }
+      valid_langs = [:"**", :en, :en, :pt, :fr, :it, :nl, :de, :zh, :ja, :co, :ro, :"!!"]
+      valid_sort_orders = [:relevance, :mostviewed, :mostdownloaded, :latest]
+      valid_upload_dates = [:any, :week, :month, :year]
+      valid_file_formats = [:all, :pdf, :ppt, :odp, :pps, :pot]
+      valid_file_types = [:all, :presentations, :documents, :webinars,:videos]
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":q must be a string and it's #{args[:q]}" unless args[:q].kind_of? String
+      raise ArgumentError.new ":page must be a positive interger and it's #{args[:page]}" unless args[:page].kind_of? Fixnum and args[:page] > 0
+      raise ArgumentError.new ":items_per_page must be a positive interger and it's #{args[:items_per_page]}" unless args[:items_per_page].kind_of? Fixnum and args[:items_per_page] > 0
+      raise ArgumentError.new ":lang must be one of #{valid_langs.join(",")} and it's #{args[:lang]}" unless valid_langs.member? args[:lang]
+      raise ArgumentError.new ":sort must be one of #{valid_sort_orders.join(",")} and it's #{args[:sort]}" unless valid_sort_orders.member? args[:sort]
+      raise ArgumentError.new ":search_in_tags_only must be true or false and it's #{args[:search_in_tags_only]}" unless args[:search_in_tags_only]==true or args[:search_in_tags_only]==false
+      raise ArgumentError.new ":upload_date must be one of #{valid_upload_dates.join(",")} and it's #{args[:upload_date]}" unless valid_upload_dates.member? args[:upload_date]
+      raise ArgumentError.new ":restrict_to_downloadables must be true or false and it's #{args[:restrict_to_downloadables]}" unless args[:restrict_to_downloadables]==true or args[:restrict_to_downloadables]==false
+      raise ArgumentError.new ":file_format must be one of #{valid_file_formats.join(",")} and it's #{args[:file_format]}" unless valid_file_formats.member? args[:file_format]
+      raise ArgumentError.new ":file_type must be one of #{valid_file_types.join(",")} and it's #{args[:file_type]}" unless valid_file_types.member? args[:file_type]
+      raise ArgumentError.new ":restrict_to_cc must be true or false and it's #{args[:restrict_to_cc]}" unless args[:restrict_to_cc]==true or args[:restrict_to_cc]==false
+      raise ArgumentError.new ":restrict_to_cc_adapt must be true or false and it's #{args[:restrict_to_cc_adapt]}" unless args[:restrict_to_cc_adapt]==true or args[:restrict_to_cc_adapt]==false
+      raise ArgumentError.new ":restrict_to_cc_commercial must be true or false and it's #{args[:restrict_to_cc_commercial]}" unless args[:restrict_to_cc_commercial]==true or args[:restrict_to_cc_commercial]==false
+      raise ArgumentError.new ":detailed must be true or false and it's #{args[:detailed]}" unless args[:detailed]==true or args[:detailed]==false
+
+      args[:what]=:tag if args[:search_in_tags_only]
+      args.delete :search_in_tags_only
+      
+      args[:download]='0' if args[:restrict_to_downloadables]
+      args.delete :restrict_to_downloadables
+
+      args[:cc]='1' if args[:restrict_to_cc]
+      args[:cc_adapt]='1' if args[:restrict_to_cc_adapt]
+      args[:cc_commercial]='1' if args[:restrict_to_cc_commercial]
+      [:restrict_to_cc,:restrict_to_cc_adapt,:restrict_to_cc_commercial].each{|k| args.delete k}
+
+      args[:detailed] = args[:detailed] ? 1 : 0
+
+      response=perform_request("search_slideshows",args)
+      Slideshare::SearchResults.from_xml(response)
     end
     
   private
