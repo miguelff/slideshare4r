@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Slideshare::Slideshow</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Slideshare::Slideshow</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/slideshare/model_rb.html">
+                lib/slideshare/model.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Modelles a <a href="Slideshow.html">Slideshow</a>
+</p>
+<p>
+See <a
+href="http://www.slideshare.net/developers/documentation#get_slideshow">www.slideshare.net/developers/documentation#get_slideshow</a>
+</p>
+<p>
+The following is a the structure of the XML that describes a <a
+href="Slideshow.html">Slideshow</a>
+</p>
+<pre>
+        &lt;Slideshow&gt;
+          &lt;ID&gt;{ slideshow id }&lt;/ID&gt;
+          &lt;Title&gt;{ slideshow title }&lt;/Title&gt;
+          &lt;Description&gt;{ slideshow description }&lt;/Description&gt;
+          &lt;Status&gt;{ 0 if queued for conversion, 1 if converting, 2 if converted,
+                    3 if conversion failed }
+          &lt;/Status&gt;
+          &lt;Username&gt;{ username }&lt;/Username&gt;
+          &lt;URL&gt;{ web permalink }&lt;/URL&gt;
+          &lt;ThumbnailURL&gt;{ thumbnail URL }&lt;/ThumbnailURL&gt;
+          &lt;ThumbnailSmallURL&gt;{ URL of smaller thumbnail }&lt;/ThumbnailSmallURL&gt;
+          &lt;Embed&gt;{ embed code }&lt;/Embed&gt;
+          &lt;Created&gt;{ date slideshow created }&lt;/Created&gt;
+          &lt;Updated&gt;{ date slideshow was last update }&lt;/Updated&gt;
+          &lt;Language&gt;{ language, as specified by two-letter code }&lt;/Language&gt;
+          &lt;Format&gt;ppt (or pdf, pps, odp, doc, pot, txt, rdf) &lt;/Format&gt;
+          &lt;Download&gt;{ 1 if available to download, else 0 }&lt;/Download&gt;
+          &lt;DownloadUrl&gt;{ returns if available to download }&lt;/DownloadUrl&gt;
+          &lt;SlideshowType&gt;{ 0 if presentation, 1 if document, 2 if a portfolio,
+            3 if video }&lt;/SlideshowType&gt;
+          &lt;InContest&gt;{ 1 if part of a contest, 0 if not }&lt;/Download&gt;
+
+          &lt;UserID&gt;{ userID }&lt;/UserID&gt;
+          &lt;ExternalAppUserID&gt;{ ExternalAppUserID if uploaded using an
+                 external app }&lt;/ExternalAppUserID&gt;
+          &lt;ExternalAppID&gt;{ ExternalAppID for the external app }&lt;/ExternalAppID&gt;
+          &lt;PPTLocation&gt;{ PPTLocation }&lt;/ExternalAppUserID&gt;
+          &lt;StrippedTitle&gt;{ Stripped Title }&lt;/StrippedTitle&gt;
+          &lt;Tags&gt;
+          &lt;Tag Count=&quot;{ number of times tag has been used }&quot; Owner=&quot;{ 1 if owner
+                        has used the tag, else 0 }&quot;&gt;{ tag name }
+          &lt;/Tag&gt;
+          &lt;/Tags&gt;
+          &lt;Audio&gt;{ 0, or 1 if the slideshow contains audio }&lt;/Audio&gt;
+          &lt;NumDownloads&gt;{ number of downloads }&lt;/NumDownloads&gt;
+          &lt;NumViews&gt;{ number of views }&lt;/NumViews&gt;
+          &lt;NumComments&gt;{ number of comments }&lt;/NumComments&gt;
+          &lt;NumFavorites&gt;{ number of favorites }&lt;/NumFavorites&gt;
+          &lt;NumSlides&gt;{ number of slides }&lt;/NumSlides&gt;
+          &lt;RelatedSlideshows&gt;
+            &lt;RelatedSlideshowID rank=&quot;{ rank, where 1 is highest}&quot;&gt;
+            { slideshow id } &lt;/RelatedSlideshowID&gt;
+          &lt;/RelatedSlideshows&gt;
+          &lt;PrivacyLevel&gt;{ 0, or 1 if private }&lt;/PrivacyLevel&gt;
+          &lt;FlagVisible&gt;{ 1, or 0 if slideshow has been flagged }&lt;/FlagVisible&gt;
+          &lt;ShowOnSS&gt;{ 0, or 1 if not to be shown on Slideshare }&lt;/ShowOnSS&gt;
+          &lt;SecretURL&gt;{ 0, or 1 if secret URL is enabled }&lt;/SecretURL&gt;
+          &lt;AllowEmbed&gt;{ 0, or 1 if embeds are allowed }&lt;/AllowEmbed&gt;
+          &lt;ShareWithContacts&gt;{ 0, or 1 if set to private, but contacts can view
+                               slideshow }
+          &lt;/ShareWithContacts&gt;
+        &lt;/Slideshow&gt;
+</pre>
+<p>
+This kind of document is unmarshalled into an instance of <a
+href="Slideshow.html">Slideshow</a> that will have the following
+properties:
+</p>
+<dl>
+<dt><tt>slideshow_id</tt></dt><dd>The ID of the slideshow
+
+</dd>
+<dt><tt>title</tt></dt><dd>Its title
+
+</dd>
+<dt><tt>description</tt></dt><dd>Its description
+
+</dd>
+<dt><tt>status</tt></dt><dd>An instance of <a href="SlideshowStatus.html">SlideshowStatus</a>
+indicating the status of the slideshow
+
+</dd>
+<dt><tt>username</tt></dt><dd>The username of the owner of the slideshow
+
+</dd>
+<dt><tt>url</tt></dt><dd>A string representing the <a href="URL.html">URL</a> of the slideshow on
+slideshare
+
+</dd>
+<dt><tt>thumbnail_url</tt></dt><dd>A string representing the <a href="URL.html">URL</a> of an image that shows
+the cover of the slideshow
+
+</dd>
+<dt><tt>thumbnail_small_url</tt></dt><dd>A string representing the <a href="URL.html">URL</a> of an image that shows
+the cover of the slideshow (a smaller one)
+
+</dd>
+<dt><tt>embed</tt></dt><dd>HTML markup to embed the slideshow
+
+</dd>
+<dt><tt>created</tt></dt><dd>A DateTime object that represents when the slideshow was created
+
+</dd>
+<dt><tt>updated</tt></dt><dd>A DateTime object that represents when the slideshow was last updated
+
+</dd>
+<dt><tt>language</tt></dt><dd>A two letter code indicating the language of the slideshow (en, es, ru,
+&#8230;)
+
+</dd>
+<dt><tt>format</tt></dt><dd>A string representing the format of the slideshow (pdf, ppt,&#8230;)
+
+</dd>
+<dt><tt>is_downloadable</tt></dt><dd><tt>true</tt> if the slideshow can be downloadable, <tt>false</tt>
+otherwise
+
+</dd>
+<dt><tt>download_url</tt></dt><dd>A String rerpresenting the <a href="URL.html">URL</a> for downloading the
+slideshow
+
+</dd>
+<dt><tt>slideshow_type</tt></dt><dd>An instance of <tt><a href="SlideshowType.html">SlideshowType</a></tt>
+indicating the type of document (document, presentation, portfolio,
+video&#8230;)
+
+</dd>
+<dt><tt>is_in_contest</tt></dt><dd><tt>true</tt> if the presentation is in context; <tt>false</tt> otherwise
+
+</dd>
+<dt><tt>user_id</tt></dt><dd>The ID of the owner of the slideshow
+
+</dd>
+<dt><tt>external_app_user_id</tt></dt><dd>External app user identifier if the slideshow has been uploaded using an
+external application
+
+</dd>
+<dt><tt>external_app_id</tt></dt><dd>External app identifier if the slideshow has been uploaded using an
+external application
+
+</dd>
+<dt><tt>ppt_location</tt></dt><dd>The location of the ppt in the server. (although is returned by the <a
+href="API.html">API</a> web method, I can&#8216;t guess what can it be
+useful for. I&#8216;d rather use <tt>download_url</tt> instead for
+downloading purposes)
+
+</dd>
+<dt><tt>stripped_title</tt></dt><dd>A stripped version of the title, if the title is too verbose.
+
+</dd>
+<dt><tt>tags</tt></dt><dd>A list of <tt><a href="Tag.html">Tag</a></tt> instances, each instance has
+the string used to tag this slideshow (<tt>name</tt>), the number of times
+this tag has been used (<tt>times_used</tt>) and if the tag has been
+previously used by its owner (<tt>used_by_owner</tt>)
+
+</dd>
+<dt><tt>has_audio</tt></dt><dd><tt>true</tt> if the slideshow has audio; <tt>false</tt> otherwise
+
+</dd>
+<dt><tt>num_downloads</tt></dt><dd>Times the slideshow has been downloaded
+
+</dd>
+<dt><tt>num_comments</tt></dt><dd>The number of comments of this slideshow
+
+</dd>
+<dt><tt>num_views</tt></dt><dd>Times this slideshow has been viewed
+
+</dd>
+<dt><tt>num_favorites</tt></dt><dd>Times that this slideshow has been favorited
+
+</dd>
+<dt><tt>num_slides</tt></dt><dd>Number of slides
+
+</dd>
+<dt><tt>related_slideshows</tt></dt><dd>A list of <tt><a href="RelatedSlideshow.html">RelatedSlideshow</a></tt>
+instances. Each instance contains the id of the slideshow
+(<tt>slideshow_id</tt>) and its rank (<tt>rank</tt>)
+
+</dd>
+<dt><tt>is_private</tt></dt><dd><tt>true</tt> if the slideshow is private; <tt>false</tt> otherwise
+
+</dd>
+<dt><tt>is_flagged_as_visible</tt></dt><dd><tt>true</tt> if the slideshow is flagged as visible; <tt>false</tt>
+otherwise
+
+</dd>
+<dt><tt>is_shown_on_slideshare</tt></dt><dd><tt>true</tt> if the slideshow is shown on slideshare; <tt>false</tt>
+otherwise
+
+</dd>
+<dt><tt>is_secret_url_enabled</tt></dt><dd><tt>true</tt> if Secret <a href="URL.html">URL</a> is enabled;
+<tt>false</tt> otherwise
+
+</dd>
+<dt><tt>is_embed_allowed</tt></dt><dd><tt>true</tt> if the slideshow can be embedable using the code returned by
+<tt>embed</tt>; <tt>false</tt> otherwise
+
+</dd>
+<dt><tt>is_only_shared_with_contacts</tt></dt><dd><tt>true</tt> if the slideshow can only be seen by its owner&#8216;s
+contacts; <tt>false</tt> if it&#8216;s public
+
+</dd>
+</dl>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000028">extraction_rules</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name"><a href="Builder.html">Builder</a></span>
+      </div>
+    </div>
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000028" class="method-detail">
+        <a name="M000028"></a>
+
+        <div class="method-heading">
+          <a href="#M000028" class="method-signature">
+          <span class="method-name">extraction_rules</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000028-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000028-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/slideshare/model.rb, line 398</span>
+398:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">extraction_rules</span>
+399:       {
+400:         <span class="ruby-identifier">:slideshow_id</span>            =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/ID&quot;</span>],
+401:         <span class="ruby-identifier">:title</span>                   =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Title&quot;</span>],
+402:         <span class="ruby-identifier">:description</span>             =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Description&quot;</span>],
+403:         <span class="ruby-identifier">:status</span>                  =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Status&quot;</span>,<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-constant">SlideshowStatus</span>.<span class="ruby-identifier">from_code</span>(<span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span>)}],
+404:         <span class="ruby-identifier">:username</span>                =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Username&quot;</span>],
+405:         <span class="ruby-identifier">:url</span>                     =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/URL&quot;</span>],
+406:         <span class="ruby-identifier">:thumbnail_url</span>           =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/ThumbnailURL&quot;</span>],
+407:         <span class="ruby-identifier">:thumbnail_small_url</span>     =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/ThumbnailSmallURL&quot;</span>],
+408:         <span class="ruby-identifier">:embed</span>                   =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Embed&quot;</span>],
+409:         <span class="ruby-identifier">:created</span>                 =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Created&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-constant">DateUtil</span><span class="ruby-operator">::</span><span class="ruby-identifier">parse</span>(<span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>)}],
+410:         <span class="ruby-identifier">:updated</span>                 =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Updated&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-constant">DateUtil</span><span class="ruby-operator">::</span><span class="ruby-identifier">parse</span>(<span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>)}],
+411:         <span class="ruby-identifier">:language</span>                =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Language&quot;</span>],
+412:         <span class="ruby-identifier">:format</span>                  =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Format&quot;</span>],
+413:         <span class="ruby-identifier">:is_downloadable</span>         =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Download&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>}],
+414:         <span class="ruby-identifier">:download_url</span>            =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/DownloadUrl&quot;</span>],
+415:         <span class="ruby-identifier">:slideshow_type</span>          =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/SlideshowType&quot;</span>,<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-constant">SlideshowType</span>.<span class="ruby-identifier">from_code</span>(<span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span>)}],
+416:         <span class="ruby-identifier">:is_in_contest</span>           =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/InContest&quot;</span>,<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>}],
+417:         <span class="ruby-identifier">:user_id</span>                 =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/UserID&quot;</span>],
+418:         <span class="ruby-identifier">:external_app_user_id</span>    =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/ExternalAppUserID&quot;</span>],
+419:         <span class="ruby-identifier">:external_app_id</span>         =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/ExternalAppID&quot;</span>],
+420:         <span class="ruby-identifier">:ppt_location</span>            =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/PPTLocation&quot;</span>],
+421:         <span class="ruby-identifier">:stripped_title</span>          =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/StrippedTitle&quot;</span>],
+422:         <span class="ruby-identifier">:tags</span>                    =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Tags&quot;</span>,<span class="ruby-identifier">lambda</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">xpath</span>(<span class="ruby-value str">&quot;Tag&quot;</span>).<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">tag_node</span><span class="ruby-operator">|</span> <span class="ruby-constant">Tag</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">tag_node</span>) }}],
+423:         <span class="ruby-identifier">:has_audio</span>               =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/Audio&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>}],
+424:         <span class="ruby-identifier">:num_downloads</span>           =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/NumDownloads&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span>}],
+425:         <span class="ruby-identifier">:num_comments</span>            =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/NumComments&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span>}],
+426:         <span class="ruby-identifier">:num_views</span>               =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/NumViews&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span>}],
+427:         <span class="ruby-identifier">:num_favorites</span>           =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/NumFavorites&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span>}],
+428:         <span class="ruby-identifier">:num_slides</span>              =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/NumSlides&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span>}],
+429:         <span class="ruby-identifier">:related_slideshows</span>      =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/RelatedSlideshows&quot;</span>,<span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">xpath</span>(<span class="ruby-value str">&quot;RelatedSlideshowID&quot;</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node_set</span><span class="ruby-operator">|</span> <span class="ruby-constant">RelatedSlideshow</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">node_set</span>)}}],
+430:         <span class="ruby-identifier">:is_private</span>              =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/PrivacyLevel&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>}],
+431:         <span class="ruby-comment cmt">#SS flaw?: what does been flagged as visible exactly mean? why if it's 0 has been flagged.. and otherwise not?</span>
+432:         <span class="ruby-identifier">:is_flagged_as_visible</span>   =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/FlagVisible&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>}],
+433:         <span class="ruby-comment cmt">#SS flaw?: why if the slideshow is shown on slideshare value of this property is 0; and if it is hidden is 1?</span>
+434:         <span class="ruby-identifier">:is_shown_on_slideshare</span>  =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/ShowOnSS&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">false</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">true</span>}],
+435:         <span class="ruby-identifier">:is_secret_url_enabled</span>   =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/SecretURL&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>}],
+436:         <span class="ruby-identifier">:is_embed_allowed</span>        =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/AllowEmbed&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>}],
+437:         <span class="ruby-identifier">:is_only_shared_with_contacts</span> =<span class="ruby-operator">&gt;</span>[<span class="ruby-value str">&quot;Slideshow/ShareWithContacts&quot;</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">text</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>}],
+438:       }
+439:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

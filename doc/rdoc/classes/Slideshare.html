@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: Slideshare</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">Slideshare</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../files/lib/slideshare/model_rb.html">
+                lib/slideshare/model.rb
+                </a>
+        <br />
+                <a href="../files/lib/slideshare/net_rb.html">
+                lib/slideshare/net.rb
+                </a>
+        <br />
+                <a href="../files/lib/slideshare_rb.html">
+                lib/slideshare.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Module <a href="Slideshare/Builder.html" class="link">Slideshare::Builder</a><br />
+Module <a href="Slideshare/DateUtil.html" class="link">Slideshare::DateUtil</a><br />
+Class <a href="Slideshare/API.html" class="link">Slideshare::API</a><br />
+Class <a href="Slideshare/GetSlideshowsByGroupResponse.html" class="link">Slideshare::GetSlideshowsByGroupResponse</a><br />
+Class <a href="Slideshare/GetSlideshowsByTagResponse.html" class="link">Slideshare::GetSlideshowsByTagResponse</a><br />
+Class <a href="Slideshare/GetSlideshowsByUserResponse.html" class="link">Slideshare::GetSlideshowsByUserResponse</a><br />
+Class <a href="Slideshare/Group.html" class="link">Slideshare::Group</a><br />
+Class <a href="Slideshare/GroupList.html" class="link">Slideshare::GroupList</a><br />
+Class <a href="Slideshare/HTTPError.html" class="link">Slideshare::HTTPError</a><br />
+Class <a href="Slideshare/Proxy.html" class="link">Slideshare::Proxy</a><br />
+Class <a href="Slideshare/RelatedSlideshow.html" class="link">Slideshare::RelatedSlideshow</a><br />
+Class <a href="Slideshare/SearchResults.html" class="link">Slideshare::SearchResults</a><br />
+Class <a href="Slideshare/Slideshow.html" class="link">Slideshare::Slideshow</a><br />
+Class <a href="Slideshare/SlideshowStatus.html" class="link">Slideshare::SlideshowStatus</a><br />
+Class <a href="Slideshare/SlideshowType.html" class="link">Slideshare::SlideshowType</a><br />
+Class <a href="Slideshare/Tag.html" class="link">Slideshare::Tag</a><br />
+Class <a href="Slideshare/URL.html" class="link">Slideshare::URL</a><br />
+
+    </div>
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>
