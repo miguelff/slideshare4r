@@ -15,7 +15,7 @@ require 'spec/rake/spectask'
 
 spec = Gem::Specification.new do |s|
   s.name = 'slideshare4r'
-  s.version = '0.0.1'
+  s.version = '0.4.0'
   s.has_rdoc = true
   s.extra_rdoc_files = ['README', 'LICENSE']
   s.summary = 'Slideshare API ruby wrapper'

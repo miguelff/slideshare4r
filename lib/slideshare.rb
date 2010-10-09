@@ -20,8 +20,8 @@ module Slideshare
     #
     # Optionally you can provide some arguments:
     #
-    # :proxy_host and :proxy_port => if you are connecting to slideshare behind and HTTP proxy
-    # :proxy_user and :proxy_pass => if the proxy needs authentication
+    #   :proxy_host and :proxy_port => if you are connecting to slideshare behind and HTTP proxy
+    #   :proxy_user and :proxy_pass => if the proxy needs authentication
     #
     def initialize(api_key, shared_secret, args={})
       raise ArgumentError.new "api_key must be a String and it's #{api_key}" unless api_key.kind_of? String
@@ -51,19 +51,18 @@ module Slideshare
     #
     # see http://www.slideshare.net/developers/documentation#get_slideshow for additional documentation
     #
-    # Required arguments
-    #    one of:
-    #     slideshow_id  => id of the slideshow to be fetched.
-    #     slideshow_url => URL of the slideshow to be fetched. This is required if slideshow_id is not set. If both are set, slideshow_id takes precedence.
+    # Required arguments. One of:
+    # [+slideshow_id+] Id of the slideshow to be fetched.
+    # [+slideshow_url+] URL of the slideshow to be fetched. This is required if slideshow_id is not set. If both are set, slideshow_id takes precedence.
     #
     # Optional arguments
     #
-    #    :username => username of the requesting user
-    #    :password => password of the requesting user
-    #    :exclude_tags => Exclude tags from the detailed information. true to exclude.
-    #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+    # [+username+] Username of the requesting user
+    # [+password+] Password of the requesting user
+    # [+exclude_tags+] Exclude tags from the detailed information. true to exclude.
+    # [+detailed+] Whether or not to include optional information. true to include, false (default) for basic information.
     #
-    # returns an Slideshare::Slideshow instance
+    # returns an Slideshow instance
     def get_slideshow(args={})
       usage=%q{
       Gets Slideshow Information
@@ -119,15 +118,14 @@ module Slideshare
     # See http://www.slideshare.net/developers/documentation#get_slideshows_by_tag for additional documentation
     #
     # Required arguments
-    #     :tag  => the tag name
-    #   
+    # [+tag+] The tag name
+    #
     # Optional arguments
-    #
-    #    :limit => max number of items to return (defaults to 10)
-    #    :offset => the number of slides to skip, before returning results.
-    #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
-    #
-    #  returns a GetSlideshowsByTagResponse instance
+    # [+limit+] Max number of items to return (defaults to 10)
+    # [+offset+] The number of slides to skip, before returning results.
+    # [+detailed+] Whether or not to include optional information. true to include, false (default) for basic information.
+    # 
+    # returns a GetSlideshowsByTagResponse instance
     def get_slideshows_by_tag(args={})
       usage=%q{
        Get slideshows with a certain tag
@@ -172,16 +170,13 @@ module Slideshare
     # See http://www.slideshare.net/developers/documentation#get_slideshows_by_tag for additional documentation
     #
     # Required arguments
-    #
-    #    :username_for => name of user whose groups are being requested
+    # [+username_for+] name of user whose groups are being requested
     #
     # Optional arguments
-    #
-    #    :username => username of the requesting user
-    #    :password => password of the requesting user
+    # [+username+] username of the requesting user
+    # [+password+] password of the requesting user
     #
     # returns a list of Group instances
-    #
     def get_user_groups(args={})
       usage=%q{
          Gets the groups a user belongs to
@@ -224,13 +219,12 @@ module Slideshare
     # See http://www.slideshare.net/developers/documentation#get_slideshows_by_group for additional documentation
     #
     # Required arguments
-    #     :group_name => Group name (as returned in :query_name in any of the elements returned by get_user_groups method)
+    # [+group_name+] Group name (as returned in +query_name+ in any of the elements returned by +get_user_groups method+)
     #
     # Optional arguments
-    #
-    #    :limit => max number of items to return (defaults to 10)
-    #    :offset => the number of slides to skip, before returning results.
-    #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
+    # [+limit+] Max number of items to return (defaults to 10)
+    # [+offset+] The number of slides to skip, before returning results.
+    # [+detailed+]  Whether or not to include optional information. true to include, false (default) for basic information.
     #
     # returns a GetSlideshowsByGroupResponse instance
     def get_slideshows_by_group(args={})
@@ -277,15 +271,14 @@ module Slideshare
     # See http://www.slideshare.net/developers/documentation#get_slideshows_by_user for additional documentation
     #
     # Required arguments
-    #    :username_for => name of user whose groups are being requested
+    # [+username_for+] Name of user whose groups are being requested
     #
     # Optional arguments
-    #
-    #    :limit => max number of items to return (defaults to 12)
-    #    :offset => the number of slides to skip, before returning results.
-    #    :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
-    #    :username => username of the requesting user
-    #    :password => password of the requesting user
+    # [+limit+] Max number of items to return (defaults to 12)
+    # [+offset+] The number of slides to skip, before returning results.
+    # [+detailed+] Whether or not to include optional information. true to include, false (default) for basic information.
+    # [+username+] Username of the requesting user
+    # [+password+] Password of the requesting user
     #
     # returns a GetSlideshowsByUserResponse instance
     def get_slideshows_by_user(args={})
@@ -337,27 +330,25 @@ module Slideshare
     #
     # See http://www.slideshare.net/developers/documentation#search_slideshows for additional documentation
     #
-    #  Required parameters
-    #     
-    #    :q => the query string
+    # Required parameters     
+    # [+q+] The query string
     #
-    #  Optional parameters
-    #   
-    #   :page => The page number of the results (works in conjunction with items_per_page), default is 1
-    #   :items_per_page => Number of results to return per page, default is 12
-    #   :lang => Language of slideshows (default is English, 'en') ('**':All,'es':Spanish,'pt':Portuguese,'fr':French,'it':Italian,'nl':Dutch, 'de':German,'zh':Chinese,'ja':Japanese,'ko':Korean,'ro':Romanian, '!!':Other)
-    #   :sort => Sort order (default is :relevance) (:mostviewed,:mostdownloaded,:latest)
-    #   :upload_date => The time period you want to restrict your search to. :week would restrict to the last week. (default is :any) (:week, :month, :year)
-    #   :search_in_tags_only => Set to 'true' if you want to search only in tags. Defaults to 'false' (search in every field)
-    #   :restrict_to_downloadables= > Set to 'true' if you want to search only for downloadable content. Defaults to 'false'.
-    #   :fileformat => File format to search for. Default is :all (:pdf, :ppt, :odp (Open Office) :pps (PowerPoint Slideshow) :pot (PowerPoint template))
-    #   :file_type => File type to search for. Default is :all. (:presentations, :documents, :webinars,:videos)
-    #   :restrict_to_cc => Set to 'true' to only retrieve results under the Creative Commons license.
-    #   :restrict_to_cc_adapt => Set to 'true' to restrict the retrieval to results under Creative Commons that allow adaption or modification. Defaults to 'false'
-    #   :restrict_to_cc_commercial => Set to 'true' to restrict the retrieval to results under commercial Creative Commons license. Defaults to 'false'
-    #   :detailed => Whether or not to include optional information. 'true' to include, 'false' (default) for basic information.
+    # Optional parameters  
+    # [+page+] The page number of the results (works in conjunction with items_per_page), default is 1
+    # [+items_per_page+] Number of results to return per page, default is 12
+    # [+lang+] Language of slideshows (default is English, +:en+) (+:"**"+ for All,+:es+ for Spanish, +:pt+ for Portuguese,+:fr+ for French, +:it+ for Italian, +:nl+ for Dutch, +:de+ for German,+:zh+ for Chinese,+:ja+ for Japanese, +:ko+ for Korean, +:ro+ for Romanian, +:"!!"+ for Other)
+    # [+sort+] Sort order (default is +:relevance+) (+:mostviewed+,+:mostdownloaded+,+:latest+)
+    # [+upload_date+] The time period you want to restrict your search to. +:week+ would restrict to the last week. (default is +:any+) (+:week+, +:month+, +:year+)
+    # [+search_in_tags_only+] Set to +true+ if you want to search only in tags. Defaults to +false+ (search in every field)
+    # [+restrict_to_downloadables+] Set to +true+ if you want to search only for downloadable content. Defaults to 'false'.
+    # [+fileformat+] File format to search for. Default is +:all+ (+:pdf+, +:ppt+, +:odp+ (Open Office) +:pps+ (PowerPoint Slideshow) +:pot+ (PowerPoint template))
+    # [+file_type+] File type to search for. Default is +:all+. (+:presentations+, +:documents+, +:webinars+,+:videos+)
+    # [+restrict_to_cc+] Set to +true+ to only retrieve results under the Creative Commons license.
+    # [+restrict_to_cc_adapt+] Set to +true+ to restrict the retrieval to results under Creative Commons that allow adaption or modification. Defaults to +false+
+    # [+restrict_to_cc_commercial+] Set to +true+ to restrict the retrieval to results under commercial Creative Commons license. Defaults to +false+
+    # [+detailed+] Whether or not to include optional information. +true+ to include, +false+ (default) for basic information.
     #
-    # returns => an instance of SearchResults
+    # returns  an instance of SearchResults
     def search_slideshows(args={})
       usage=%q{
      Performs a search for slideshows
@@ -403,7 +394,7 @@ module Slideshare
         :restrict_to_cc_commercial => false,
         :detailed=> false
       }
-      valid_langs = [:"**", :en, :en, :pt, :fr, :it, :nl, :de, :zh, :ja, :co, :ro, :"!!"]
+      valid_langs = ["**".to_sym, :en, :en, :pt, :fr, :it, :nl, :de, :zh, :ja, :co, :ro, "!!".to_sym]
       valid_sort_orders = [:relevance, :mostviewed, :mostdownloaded, :latest]
       valid_upload_dates = [:any, :week, :month, :year]
       valid_file_formats = [:all, :pdf, :ppt, :odp, :pps, :pot]

@@ -73,10 +73,10 @@ module Slideshare
 
      # Initializes a new instance of an HTTP proxy
      #
-     # host => proxy host (e.g. proxy.organization.com)
-     # port => an integer between 0 and 65535, defaults to 8080
-     # user => if it needs authentication, proxy's user name
-     # password => if it needs authentication, proxy's user password
+     # [+host+] Proxy host (e.g. proxy.organization.com)
+     # [+port+] An integer between 0 and 65535, defaults to 8080
+     # [+user+] If it needs authentication, proxy's user name
+     # [+password+] If it needs authentication, proxy's user password
      def initialize(host, port=8080, user=nil, password=nil)
        raise ArgumentError.new "you must provide host and port for the proxy. (Provided: host=>#{host}, port=>#{port})" if host.nil? || port.nil?
        raise ArgumentError.new "host must be a string and it's #{host}" unless host.kind_of? String
