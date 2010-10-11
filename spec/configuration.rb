@@ -6,6 +6,8 @@ module Config
   
   SAMPLE_SLIDESHOW_URL="http://www.slideshare.net/miguelff/real-time"
   SAMPLE_SLIDESHOW_ID="xxx"
-  SAMPLE_USERNAME="miguelff" #change with any user's with an active profile
-  SAMPLE_PASSWORD="cc057700" #change with its password (testing purposes)
+  puts "enter username"
+  SAMPLE_USERNAME=gets #change with any user's with an active profile
+  puts "enter password"
+  SAMPLE_PASSWORD=gets #change with its password (testing purposes)
 end
