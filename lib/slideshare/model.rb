@@ -24,11 +24,15 @@ module Slideshare
     # certain information from it adding new properties to the instance
     # being built on the fly.
     #
-    # The information to gather from the XML document is pointed by a dictionary
-    # returned by self.extraction_rules method, which is defined in each of the classes
-    # that include the module.
+    # The information to gather from the XML document is conditioned by two dictionaries,
+    # respectively returned by:
     #
-    # This dictionary contains the name of the instance property as the key,
+    # * self.extraction_rules
+    # * self.exclusion_rules
+    #
+    # both are defined as class methods in the classes that includes this module
+    #
+    # This first dictionary contains the name of the instance property as the key,
     # and a list indicating how to extract it from the XML as the value. The latter
     # must have at least one first element, which is the XPATH expression that points
     # to the xml that encloses the value of the property. An optional second parameter
@@ -69,19 +73,134 @@ module Slideshare
     #
     # this instance will also have accessor methods for both id, and title.
     #
+    # The second dictionary, restricts what to extract. It defines a ser of rules to apply
+    # to the properties extracted from the XML, if a rules applied on a property, evaluates
+    # to true, that property will be excluded from de set of properties to define on the instance.
+    # Taking again the example above, imagine that we define Slideshow class as follows:
+    #
+    #         class Slideshow
+    #          include Builder
+    #
+    #          def self.extraction_rules
+    #            {
+    #              :id=>["Slideshow/ID"],
+    #              :title=>["Slideshow/Title",lambda{|x| x.value.upcase}]
+    #            }
+    #          end
+    #
+    #          def self.exclusion_rules
+    #            {
+    #               :title=>lambda{|title| title.size < 10}
+    #          end
+    #         end
+    #
+    # This will omit the definition of the title property, if title has less than 10 characters,
+    # so if we provide again the same XML document
+    #
+    #         xml_str=%q{
+    #         <Slideshow>
+    #          <ID>foo</ID>
+    #          <Title>bar/Title>
+    #         </Slideshow>
+    #         }
+    #
+    # and build a slideshow from it
+    #
+    #         Slideshow.from_xml(xml_str)
+    #
+    # we will obtain something like
+    #
+    #         <Slideshow:0x1014e11f8 @id="foo">
+    #
+    # (i.e.) title was excluded from the set of properties defined, as it is "bar" and has less
+    # that 10 characters.
+    #
     def from_xml(xml_doc)
+      extraction_rules = (self.respond_to? :extraction_rules) ? self.extraction_rules : {}
+      exclusion_rules = (self.respond_to? :exclusion_rules) ? self.exclusion_rules : {}
       instance=self.new
       xml_doc  = Nokogiri::XML(xml_doc.to_s) unless xml_doc.kind_of? Nokogiri::XML::Node
-      self.extraction_rules.each_pair do |attribute,rule|
+      extraction_rules.each_pair do |attribute,rule|
         path=rule[0]
         extraction_predicate=rule[1] ||= lambda{|x| x.text}
-        instance.instance_variable_set("@#{attribute}",extraction_predicate.call(xml_doc.xpath(path)))
-        instance.instance_eval "def #{attribute}; @#{attribute}; end"
-        instance.instance_eval "def #{attribute}=(value); @#{attribute}=value;end"
+        property_value=extraction_predicate.call(xml_doc.xpath(path))
+        exclusion_rule=exclusion_rules[attribute]
+        unless exclusion_rule and exclusion_rule.call(property_value)
+          instance.instance_variable_set("@#{attribute}",property_value)
+          instance.instance_eval "def #{attribute}; @#{attribute}; end"
+          instance.instance_eval "def #{attribute}=(value); @#{attribute}=value;end"
+        end
       end
       instance
     end
   end
+
+  # Modelles a Group
+  #
+  # The following is the structure  of the XML returned by the API web method,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #        <Contact>
+  #          <Userame>{ Username }</Username>
+  #          <NumSlideshows>{ Number of Slideshows }</NumSlideshows>
+  #          <NumComments>{ Number of Comments }</NumComments>
+  #        <Contact>
+  #
+  # An instance of group has the following properties:
+  #
+  # [+name+] Contact's username
+  # [+num_slideshows+] Number of slideshows owned by this contact
+  # --
+  #  What's the exact meaning of num_comments?
+  #
+  #  - Comments submitted by the contact (on any slideshow)
+  #  - Comments submitted by the contact (on the requesting user slideshow?)
+  #
+  #  I guess is the first one because get_user_contacts doesn't need any kind of
+  #  authentication. But it can drive to confusion.
+  # ++
+  # [+num_comments+] Number of comments posted? by the contact
+  #
+  class Contact
+    include Builder
+
+    def self.extraction_rules
+      {
+        :name           => ["Contact/Username"],
+        :num_slideshows => ["Contact/NumSlideshows",lambda{|node| node.text.to_i}],
+        :num_comments   => ["Contact/NumComments",lambda{|node| node.text.to_i}],
+      }
+    end
+  end
+
+  # Modelles a list of users
+  #
+  # The following is the structure  of the XML that represents a list of contacts,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #        <Contacts>
+  #          <Contact>
+  #          ...
+  #          </Contact>
+  #          <Contact>
+  #          ...
+  #          </Contact>
+  #        </Contacts>
+  #
+  # An instance of ContactList has the following properties:
+  #
+  # [+items+] A list of Contact instances
+  #
+  class ContactList
+    include Builder
+
+    def self.extraction_rules
+      {
+        :items =>["//Contact",lambda{|nodeset| nodeset.map{|element| Contact.from_xml(element)}}],
+      }
+    end
+  end
+  
 
   # Modelles the response of API#get_slideshows_by_group method
   #
@@ -221,7 +340,6 @@ module Slideshare
         :url            => ["Group/URL"]
       }
     end
-
   end
 
   # Modelles a list of groups
@@ -247,10 +365,9 @@ module Slideshare
 
     def self.extraction_rules
       {
-        :items =>["//Group",lambda{|nodeset| nodeset.map{|element| Group.from_xml(element)}}],
+        :items =>["/Groups/Group",lambda{|nodeset| nodeset.map{|element| Group.from_xml(element)}}],
       }
     end
-    
   end
 
   # Modelles the result of searching for slideshows
@@ -419,7 +536,7 @@ module Slideshare
         :external_app_id         =>["Slideshow/ExternalAppID"],
         :ppt_location            =>["Slideshow/PPTLocation"],
         :stripped_title          =>["Slideshow/StrippedTitle"],
-        :tags                    =>["Slideshow/Tags",lambda { |node| node.xpath("Tag").map { |tag_node| Tag.from_xml(tag_node) }}],
+        :tags                    =>["Slideshow/Tags",lambda { |node| TagList.from_xml(node).items }],
         :has_audio               =>["Slideshow/Audio", lambda{|node| node.text.to_i == 1 ? true : false}],
         :num_downloads           =>["Slideshow/NumDownloads", lambda{|node| node.text.to_i}],
         :num_comments            =>["Slideshow/NumComments", lambda{|node| node.text.to_i}],
@@ -534,21 +651,65 @@ module Slideshare
   #                         has used the tag, else 0 }">{ tag name }
   #         </Tag>
   #
-  # Each instance has the string used to tag this slideshow (:name),
-  # the number of times this tag has been used (:times_used)
-  # and if the tag has been previously used by its owner (:used_by_owner)
+  # Each instance has the following properties:
+  # [+name+] The tag name
+  # [+times_used+] The number of times this tag has been used
+  # [+used_by_owner+] true if the tag has been previously used by its owner, false otherwise.
+  #
+  # This class defines an exclusion rule on +used_by_owner+ attribute. If it is +nil+,
+  # we don't include it into the instance set of properties.
+  #
   class Tag
-      
+
     include Builder
-      
+
     def self.extraction_rules
       {
-        :times_used     =>  [".",lambda { |node_set| node_set.first["Count"].to_i }],
-        :used_by_owner  =>  [".",lambda { |node_set| node_set.first["Owner"].to_i == 1 ? true : false}],
-        :name           =>  ["."]
+        :name           =>  ["Tag"],
+        :times_used     =>  ["Tag",lambda { |nodeset| nodeset.first["Count"].nil? ? nil :  nodeset.first["Count"].to_i }],
+        :used_by_owner  =>  ["Tag",lambda { |nodeset| nodeset.first["Owner"].nil? ? nil :  nodeset.first["Owner"].to_i == 1 }],
+      }
+    end
+
+    def self.exclusion_rules
+      {
+        :used_by_owner => lambda {|value| value.nil?}
       }
     end
   end
+
+
+
+  # Modelles a list of tags
+  #
+  # The following is the structure  of the XML that represents a list of tags,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #        <Tags>
+  #         <Tag>
+  #         ...
+  #         </Tag>
+  #         <Tag>
+  #         ...
+  #         </Tag>
+  #        </Tags>
+  #
+  # An instance of TagList has the following properties:
+  #
+  # [+items+] A list of Tag instances
+  #
+  class TagList
+
+    include Builder
+
+    def self.extraction_rules
+      {
+        :items=>["/Tags/Tag",lambda{|nodeset| nodeset.map{|element| Tag.from_xml(element.to_s)}}]
+      }
+    end
+
+  end
+
 
   # Modelles a RelatedSlideshow
   #

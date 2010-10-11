@@ -428,6 +428,70 @@ describe API do
     
   end
 
+  describe "get_user_contacts" do
+    before(:each) do
+      @api=API.new Config::API_KEY, Config::SHARED_SECRET, :proxy_host=>Config::PROXY_HOST, :proxy_port=>Config::PROXY_PORT
+    end
+
+    it "should raise an error if :user is not provided" do
+      lambda{@api.get_user_contacts}.should raise_error(ArgumentError)
+    end
+
+    it "should raise an error  if :username_for is not a string" do
+      lambda{@api.get_user_contacts :username_for=>3}.should raise_error(ArgumentError)
+      lambda{@api.get_user_contacts :username_for=>nil}.should raise_error(ArgumentError)
+    end
+
+    it "should raise an error if :limit is not a positive integer" do
+      lambda{@api.get_slideshows_by_tag :username_for=>"user", :limit=>0}.should raise_error(ArgumentError)
+      lambda{@api.get_slideshows_by_tag :username_for=>"user", :limit=>-1}.should raise_error(ArgumentError)
+      lambda{@api.get_slideshows_by_tag :username_for=>"user", :limit=>"2asdf"}.should raise_error(ArgumentError)
+    end
+
+    it "should raise an error if :offset is not a positive integer" do
+      lambda{@api.get_slideshows_by_tag :username_for=>"user", :offset=>0}.should raise_error(ArgumentError)
+      lambda{@api.get_slideshows_by_tag :username_for=>"user", :offset=>-1}.should raise_error(ArgumentError)
+      lambda{@api.get_slideshows_by_tag :username_for=>"user", :offset=>"2asdf"}.should raise_error(ArgumentError)
+    end
+
+
+    it "should retrieve the list of contacts  when requested" do
+      response=@api.get_user_contacts(:username_for=>"Bern7", :offset=>1, :limit=>100)
+      response.should_not be_nil
+      response.should be_a_kind_of Array
+      response.should_not be_empty
+    end
+
+  end
+
+  describe "get_user_tags" do
+    before(:each) do
+      @api=API.new Config::API_KEY, Config::SHARED_SECRET, :proxy_host=>Config::PROXY_HOST, :proxy_port=>Config::PROXY_PORT
+    end
+
+    it "should raise an error if :username is not provided" do
+      lambda{@api.get_user_tags}.should raise_error(ArgumentError)
+    end
+
+    it "should raise an error  if :username is provided but :password not" do
+      lambda{@api.get_user_tags :username=>"foo"}.should raise_error(ArgumentError)
+    end
+
+    it "should raise an error  if :password is provided but :username not" do
+      lambda{@api.get_user_tags :password=>"foo"}.should raise_error(ArgumentError)
+    end
+
+
+    it "should retrieve the list of tags when requested" do
+      response=@api.get_user_tags(:username => Config::SAMPLE_USERNAME, :password => Config::SAMPLE_PASSWORD)
+      response.should_not be_nil
+      response.should be_a_kind_of Array
+      response.should_not be_empty
+      lambda{response.first.times_used}.should_not raise_error
+      lambda{response.first.used_by_owner}.should raise_error
+    end
+  end
+  
 end
 
 

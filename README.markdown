@@ -13,8 +13,8 @@ Take a look at [lib/slideshare.rb](http://github.com/miguelff/slideshare4r/blob/
 * [get_slideshows_by_user](http://www.slideshare.net/developers/documentation#get_slideshows_by_user)	-> COMPLETED
 * [search_slideshows](http://www.slideshare.net/developers/documentation#search_slideshows)		-> COMPLETED
 * [get_user_groups](http://www.slideshare.net/developers/documentation#get_user_groups)		-> COMPLETED
-* [get_user_contacts](http://www.slideshare.net/developers/documentation#get_user_contacts)		-> PENDING
-* [get_user_tags](http://www.slideshare.net/developers/documentation#get_user_tags)		-> PENDING
+* [get_user_contacts](http://www.slideshare.net/developers/documentation#get_user_contacts)		-> COMPLETED
+* [get_user_tags](http://www.slideshare.net/developers/documentation#get_user_tags)		-> COMPLETED
 * [edit_slideshow](http://www.slideshare.net/developers/documentation#edit_slideshow)		-> PENDING
 * [delete_slideshow](http://www.slideshare.net/developers/documentation#delete_slideshow)		-> PENDING
 * [upload_slideshow](http://www.slideshare.net/developers/documentation#upload_slideshow)		-> PENDING

@@ -196,7 +196,7 @@ module Slideshare
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
 
-       default_args={
+      default_args={
         :username_for =>nil,
         :username=>nil,
         :password=>nil,
@@ -271,7 +271,7 @@ module Slideshare
     # See http://www.slideshare.net/developers/documentation#get_slideshows_by_user for additional documentation
     #
     # Required arguments
-    # [+username_for+] Name of user whose groups are being requested
+    # [+username_for+] Name of the user whose groups are being requested
     #
     # Optional arguments
     # [+limit+] Max number of items to return (defaults to 12)
@@ -288,7 +288,7 @@ module Slideshare
        See http://www.slideshare.net/developers/documentation#get_slideshows_by_user for additional documentation
 
        Required arguments
-          :username_for => name of user whose groups are being requested
+          :username_for => name of the user whose groups are being requested
 
        Optional arguments
 
@@ -434,19 +434,103 @@ module Slideshare
       response=perform_request("search_slideshows",args)
       Slideshare::SearchResults.from_xml(response)
     end
-    
-  private
 
-  #performs an HTTP request to the given webmethod using the given optional args
-  def perform_request(web_method,args={})
-    ts=Time.now.to_i
-    hash=Digest::SHA1.hexdigest(shared_secret+ts.to_s)
-    args.merge! :api_key=>api_key, :ts=>ts, :hash=>hash
-    url=URL.new web_method, args
-    #puts "\n\n#{url}\n\n" if web_method == "get_slideshows_by_user"
-    url.get @proxy
-  end
+    
+    # Gets the contacts of a certain user
+    #
+    # See http://www.slideshare.net/developers/documentation#get_user_contacts for additional documentation
+    #
+    # Required arguments
+    # [+username_for+] Name of the user whose contacts are being requested
+    #
+    # Optional arguments
+    # [+limit+] Max number of items to return (defaults to 12)
+    # [+offset+] The number of slides to skip, before returning results.
+    #
+    def get_user_contacts(args={})
+       usage=%q{
+         Gets the groups a user belongs to
+
+         See http://www.slideshare.net/developers/documentation#get_slideshows_by_tag for additional documentation
+
+         Required arguments
+
+            :username_for => name of the user whose contacts are being requested
+
+         Optional arguments
+
+            :limit => Max number of items to return (defaults to 12)
+            :offset => The number of slides to skip, before returning results.
+
+         returns a list of Contact instances
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+
+      default_args={
+        :username_for =>nil,
+        :limit =>12,
+        :offset=>nil,
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":username_for must be a string and it's #{args[:username_for]}" unless args[:username_for].kind_of? String
+      raise ArgumentError.new ":limit must be a number greater than 0 and it's #{args[:limit]}" unless args[:limit].kind_of? Fixnum and args[:limit] > 0
+      raise ArgumentError.new ":offset must be a number greater than 0 and it's #{args[:offset]}" unless args[:offset].nil? or (args[:offset].kind_of? Fixnum and args[:offset] > 0)
+      
+      response=perform_request("get_user_contacts",args)
+      Slideshare::ContactList.from_xml(response).items
+    end
+
+    # Gets the tags of the user whose credentials are provided
+    #
+    # See http://www.slideshare.net/developers/documentation#get_user_tags for additional documentation
+    #
+    # Required arguments
+    # [+username+] Username of the requesting user
+    # [+password+] Password of the requesting user
+    #
+    # returns a list of Tag instances
+    def get_user_tags(args={})
+    usage=%q{
+           Gets the tags of the user whose credentials are provided
+
+           See http://www.slideshare.net/developers/documentation#get_user_tags for additional documentation
+
+           Required arguments
+           :username => Username of the requesting user
+           :password => Password of the requesting user
+
+           returns a list of Tag instances
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+      default_args={
+        :username=>nil,
+        :password=>nil
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":username must be a string and it's #{args[:username]}" unless args[:username].kind_of? String
+      raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
+      
+      response=perform_request("get_user_tags",args)
+      Slideshare::TagList.from_xml(response).items
+    end
+
+    private
+
+    #performs an HTTP request to the given webmethod using the given optional args
+    def perform_request(web_method,args={})
+      ts=Time.now.to_i
+      hash=Digest::SHA1.hexdigest(shared_secret+ts.to_s)
+      args.merge! :api_key=>api_key, :ts=>ts, :hash=>hash
+      url=URL.new web_method, args
+      url.get @proxy
+    end
   
-end
+  end
 
 end
