@@ -135,6 +135,35 @@ module Slideshare
     end
   end
 
+  # Modelles the response of API#check_favorite method
+  #
+  # The following is the structure  of the XML returned by the API web method,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #<SlideShow>
+  # <SlideShowID>SlideShowID</SlideShowID>
+  # <User>User ID</User>
+  # <Favorited>true: Slideshow was favorited, false otherwise</Favorites>
+  #</SlideShow>
+  #
+  # An instance of CheckFavoriteResponse has the following properties:
+  #
+  # [+slideshow_id+] The id of the slideshow we want to know if it has been favorited
+  # [+user_id+] Id for the user we want to know if has favorited the slideshow
+  # [+marked_as_favorite+] true if the slideshow is favorited; false otherwise
+  #
+  class CheckFavoriteResponse
+    include Builder
+
+    def self.extraction_rules
+      {
+        :slideshow_id => ["/SlideShow/SlideShowID"],
+        :user_id => ["/SlideShow/User"],
+        :marked_as_favorite =>["/SlideShow/Favorited",lambda{|node| node.text=="true" ? true : false }]
+      }
+    end
+  end
+
   # Modelles a Group
   #
   # The following is the structure  of the XML returned by the API web method,
@@ -210,7 +239,31 @@ module Slideshare
     end
      
   end
-  
+
+  # Modelles the response of API#delete_slideshow method
+  #
+  # The following is the structure  of the XML returned by the API web method,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #   <SlideShowDeleted>
+  #     <SlideShowID>SlideShowID</SlideShowID>
+  #   </SlideShowDeleted>
+  #
+  # An instance of EditSlideshowResponse has the following properties:
+  #
+  # [+slideshow_id+] The id of the slideshow deleted
+  # [+success+] true if the slideshow was successfully deleted; false otherwise
+  #
+  class DeleteSlideshowResponse
+    include Builder
+
+    def self.extraction_rules
+      {
+        :slideshow_id => ["/SlideShowDeleted/SlideShowID"],
+        :success => ["/SlideShowDeleted/SlideShowID",lambda{|node| node.empty? ? false : true}]
+      }
+    end
+  end
 
   # Modelles the response of API#edit_slideshow method
   #
@@ -221,7 +274,7 @@ module Slideshare
   #     <SlideShowID>SlideShowID</SlideShowID>
   #   </SlideShowEdited>
   #
-  # An instance of EditSlideshowResponse has the following properties:
+  # An instance of DeleteSlideshowResponse has the following properties:
   #
   # [+slideshow_id+] The id of the slideshow edited
   # [+success+] true if the slideshow was successfully updated; false otherwise
@@ -233,6 +286,31 @@ module Slideshare
       {
         :slideshow_id => ["/SlideShowEdited/SlideShowID"],
         :success => ["/SlideShowEdited/SlideShowID",lambda{|node| node.empty? ? false : true}]
+      }
+    end
+  end
+
+  # Modelles the response of API#favorite_slideshow method
+  #
+  # The following is the structure  of the XML returned by the API web method,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #  <SlideShow>
+  #   <SlideShowID>SlideShowID</SlideShowID>
+  #  </SlideShow>
+  #
+  # An instance of FavoriteSlideshowResponse has the following properties:
+  #
+  # [+slideshow_id+] The id of the slideshow favorited
+  # [+success+] true if the slideshow was successfully favorited; false otherwise
+  #
+  class FavoriteSlideshowResponse
+    include Builder
+
+    def self.extraction_rules
+      {
+        :slideshow_id => ["/SlideShow/SlideShowID"],
+        :success => ["/SlideShow/SlideShowID",lambda{|node| node.empty? ? false : true}]
       }
     end
   end

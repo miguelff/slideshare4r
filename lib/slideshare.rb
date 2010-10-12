@@ -554,7 +554,7 @@ module Slideshare
 
     # Edits the slideshow with the given id
     # 
-    # See http://www.slideshare.net/developers/documentation#get_user_tags for additional documentation
+    # See http://www.slideshare.net/developers/documentation#edit_slideshow for additional documentation
     #
     # Required arguments
     # [+slideshow_id+] Id of the slideshow
@@ -654,6 +654,141 @@ module Slideshare
 
       response=perform_request("edit_slideshow",args)
       Slideshare::EditSlideshowResponse.from_xml(response).success
+    end
+
+    # Deletes the slideshow with the given id
+    #
+    # See http://www.slideshare.net/developers/documentation#delete_slideshow for additional documentation
+    #
+    # Required arguments
+    # [+slideshow_id+] Id of the slideshow
+    # [+username+] Username of the owner of the slideshow
+    # [+password+] Password of the owner of the slideshow
+    # 
+    # Returs true if the slideshow has been successfully deleted, false otherwise
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+    def delete_slideshow(args={})
+        usage=%q{
+           Deletes the slideshow with the given id
+
+           See http://www.slideshare.net/developers/documentation#delete_slideshow for additional documentation
+
+           Required arguments
+           [+slideshow_id+] Id of the slideshow
+           [+username+] Username of the owner of the slideshow
+           [+password+] Password of the owner of the slideshow
+
+           Returs true if the slideshow has been successfully deleted, false otherwise
+
+           raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+      default_args={
+        :slideshow_id => nil,
+        :username => nil,
+        :password => nil,
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":slideshow_id must be a string and it's #{args[:slideshow_id]}" unless args[:slideshow_id].kind_of? String
+      raise ArgumentError.new ":username must be a string and it's #{args[:username]}" unless args[:username].kind_of? String
+      raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
+
+      response=perform_request("delete_slideshow",args)
+      Slideshare::EditSlideshowResponse.from_xml(response).success
+    end
+
+    # Favorites the slideshow with the given id
+    #
+    # See http://www.slideshare.net/developers/documentation#add_favorite for additional documentation
+    #
+    # Required arguments
+    # [+slideshow_id+] Id of the slideshow
+    # [+username+] Username of the owner of the slideshow
+    # [+password+] Password of the owner of the slideshow
+    #
+    # Returs true if the slideshow has been successfully favorited, false otherwise
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+    def favorite_slideshow(args={})
+        usage=%q{
+           Marks the slideshow with the given id as favorite
+
+           See http://www.slideshare.net/developers/documentation#add_favorite for additional documentation
+
+           Required arguments
+           [+slideshow_id+] Id of the slideshow
+           [+username+] Username of the owner of the slideshow
+           [+password+] Password of the owner of the slideshow
+
+           Returs true if the slideshow has been successfully favorited, false otherwise
+
+           raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+      default_args={
+        :slideshow_id => nil,
+        :username => nil,
+        :password => nil,
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":slideshow_id must be a string and it's #{args[:slideshow_id]}" unless args[:slideshow_id].kind_of? String
+      raise ArgumentError.new ":username must be a string and it's #{args[:username]}" unless args[:username].kind_of? String
+      raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
+
+      response=perform_request("add_favorite",args)
+      Slideshare::FavoriteSlideshowResponse.from_xml(response).success
+    end
+
+    # Checks if the slideshow with the given id is favorite for the user whose credentials are provided
+    #
+    # See http://www.slideshare.net/developers/documentation#check_favorite for additional documentation
+    #
+    # Required arguments
+    # [+slideshow_id+] Id of the slideshow
+    # [+username+] Username of the owner of the slideshow
+    # [+password+] Password of the owner of the slideshow
+    #
+    # Returs true if the slideshow is favorite for the user authenticated
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+    def check_favorite(args={})
+        usage=%q{
+           Checks if the slideshow with the given id is favorite for the user whose credentials are provided
+
+           See http://www.slideshare.net/developers/documentation#check_favorite for additional documentation
+
+           Required arguments
+           [+slideshow_id+] Id of the slideshow
+           [+username+] Username of the owner of the slideshow
+           [+password+] Password of the owner of the slideshow
+
+           Returs true if the slideshow is favorite for the user authenticated
+
+           raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+      default_args={
+        :slideshow_id => nil,
+        :username => nil,
+        :password => nil,
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":slideshow_id must be a string and it's #{args[:slideshow_id]}" unless args[:slideshow_id].kind_of? String
+      raise ArgumentError.new ":username must be a string and it's #{args[:username]}" unless args[:username].kind_of? String
+      raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
+
+      response=perform_request("check_favorite",args)
+      Slideshare::CheckFavoriteResponse.from_xml(response).marked_as_favorite
     end
 
     private

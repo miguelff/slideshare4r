@@ -16,9 +16,9 @@ Take a look at [lib/slideshare.rb](http://github.com/miguelff/slideshare4r/blob/
 * [get_user_contacts](http://www.slideshare.net/developers/documentation#get_user_contacts)		-> COMPLETED
 * [get_user_tags](http://www.slideshare.net/developers/documentation#get_user_tags)		-> COMPLETED
 * [edit_slideshow](http://www.slideshare.net/developers/documentation#edit_slideshow)		-> COMPLETED
-* [delete_slideshow](http://www.slideshare.net/developers/documentation#delete_slideshow)		-> PENDING
-* [add_favorite](http://www.slideshare.net/developers/documentation#add_favorite)                 -> PENDING
-* [check_favorite](http://www.slideshare.net/developers/documentation#check_favorite)              -> PENDING
+* [delete_slideshow](http://www.slideshare.net/developers/documentation#delete_slideshow)		-> COMPLETED
+* [add_favorite](http://www.slideshare.net/developers/documentation#add_favorite)                 -> WORK_IN_PROGRESS
+* [check_favorite](http://www.slideshare.net/developers/documentation#check_favorite)              -> WORK_IN_PROGRESS
 * [upload_slideshow](http://www.slideshare.net/developers/documentation#upload_slideshow)		-> PENDING
 * [get_user_campaigns](http://www.slideshare.net/developers/documentation#get_user_campaigns)		-> PENDING
 * [get_user_leads](http://www.slideshare.net/developers/documentation#get_user_leads)		-> PENDING
