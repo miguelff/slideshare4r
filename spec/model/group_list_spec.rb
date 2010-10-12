@@ -7,7 +7,7 @@ include Slideshare
 describe GroupList do
 
   describe "from_xml providing a complete an xml document with just one Group definition" do
-    before(:each) do
+    before(:all) do
         xml=%q{
           <Groups>
             <Group>
@@ -27,10 +27,17 @@ describe GroupList do
   end
 
     describe "from_xml providing a complete an xml document with two Group definitions" do
-        before(:each) do
+        before(:all) do
         xml=%q{
           <Groups>
             <Group>
+              <Name>Viajes, Travels, Voyages</Name>
+              <NumPosts>100</NumPosts>
+              <NumSlideshows>200</NumSlideshows>
+              <NumMembers>3</NumMembers>
+              <Created>Sat Sep 18 08:09:00 -0500 2010</Created>
+              <QueryName>viajes-travels-voyages</QueryName>
+              <URL>http://www.slideshare.net/group/viajes-travels-voyages</URL>
             </Group>
             <Group>
             </Group>
@@ -47,6 +54,12 @@ describe GroupList do
       @response.items.each do |item|
         item.should be_kind_of Group
       end
+    end
+
+    it "first group is populated" do
+      @response.first.should be_kind_of Group
+      @response.first.name.should == "Viajes, Travels, Voyages"
+      @response.first.num_posts.should == 100
     end
   end
 

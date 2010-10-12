@@ -25,7 +25,7 @@ describe "API#get_user_tags" do
   it "should retrieve the list of tags when requested" do
     response=@api.get_user_tags(:username => Config::SAMPLE_USERNAME, :password => Config::SAMPLE_PASSWORD)
     response.should_not be_nil
-    response.should be_a_kind_of Array
+    response.should be_a_kind_of TagList
     response.should_not be_empty
     lambda{response.first.times_used}.should_not raise_error
     lambda{response.first.used_by_owner}.should raise_error

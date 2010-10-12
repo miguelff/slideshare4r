@@ -7,11 +7,11 @@ include Slideshare
 describe ContactList do
 
   describe "from_xml providing a complete an xml document with just one Contact definition" do
-    before(:each) do
+    before(:all) do
         xml=%q{
           <Contacts>
-            <Contact>
-            </Contact>
+           <Contact>
+           </Contact>
           </Contacts>
           }
       @response=ContactList.from_xml xml
@@ -27,11 +27,14 @@ describe ContactList do
   end
 
     describe "from_xml providing a complete an xml document with two Contact definitions" do
-        before(:each) do
+        before(:all) do
         xml=%q{
            <Contacts>
-            <Contact>
-            </Contact>
+           <Contact>
+            <Username>miguelff</Username>
+            <NumComments>100</NumComments>
+            <NumSlideshows>200</NumSlideshows>
+           </Contact>
             <Contact>
             </Contact>
           </Contacts>
@@ -47,6 +50,13 @@ describe ContactList do
       @response.items.each do |item|
         item.should be_kind_of Contact
       end
+    end
+
+    it "first contact is populated" do
+      @response.first.should be_kind_of Contact
+      @response.first.name.should == "miguelff"
+      @response.first.num_slideshows.should == 200
+      @response.first.num_comments.should == 100
     end
   end
 

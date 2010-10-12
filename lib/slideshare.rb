@@ -84,6 +84,8 @@ module Slideshare
         :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
 
       returns an Slideshare::Slideshow instance
+
+      raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
 
@@ -146,6 +148,8 @@ module Slideshare
           :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
 
        returns a GetSlideshowsByTagResponse instance
+
+       raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
       default_args={
@@ -180,7 +184,7 @@ module Slideshare
     # [+username+] username of the requesting user
     # [+password+] password of the requesting user
     #
-    # returns a list of Group instances
+    # returns a GroupList instance, each element is a Group
     #
     # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_user_groups(args={})
@@ -199,6 +203,8 @@ module Slideshare
             :password => password of the requesting user
 
          returns a list of Group instances
+
+         raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
 
@@ -215,7 +221,7 @@ module Slideshare
       raise ArgumentError.new ":password must be provided for :username=>#{args[:username]}" unless args[:username].nil? or not args[:password].nil?
 
       response=perform_request("get_user_groups",args)
-      Slideshare::GroupList.from_xml(response).items
+      Slideshare::GroupList.from_xml(response)
     end
 
     
@@ -251,6 +257,8 @@ module Slideshare
           :detailed => Whether or not to include optional information. true to include, false (default) for basic information.
 
        returns a GetSlideshowsByGroupResponse instance
+
+       raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
       default_args={
@@ -309,6 +317,8 @@ module Slideshare
           :password => password of the requesting user
 
        returns a GetSlideshowsByUserResponse instance
+
+       raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
       default_args={
@@ -358,7 +368,7 @@ module Slideshare
     # [+restrict_to_cc_commercial+] Set to +true+ to restrict the retrieval to results under commercial Creative Commons license. Defaults to +false+
     # [+detailed+] Whether or not to include optional information. +true+ to include, +false+ (default) for basic information.
     #
-    # returns  an instance of SearchResults
+    # returns an instance of SearchResults
     #
     # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def search_slideshows(args={})
@@ -388,6 +398,8 @@ module Slideshare
        :detailed => Whether or not to include optional information. 'true' to include, 'false' (default) for basic information.
 
       returns => an instance of SearchResults
+
+      raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
       default_args={
@@ -459,11 +471,11 @@ module Slideshare
     # [+limit+] Max number of items to return (defaults to 12)
     # [+offset+] The number of slides to skip, before returning results.
     #
-    # returns a list of Contact instances. Each element in the list modelles a user contact
+    # returns an instance of ContactList. Each element in the list modelles a user contact
     #
-    # raise Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_user_contacts(args={})
-       usage=%q{
+      usage=%q{
          Gets the groups a user belongs to
 
          See http://www.slideshare.net/developers/documentation#get_slideshows_by_tag for additional documentation
@@ -478,6 +490,8 @@ module Slideshare
             :offset => The number of slides to skip, before returning results.
 
          returns a list of Contact instances
+
+         raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
       }
       raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
 
@@ -495,7 +509,7 @@ module Slideshare
       raise ArgumentError.new ":offset must be a number greater than 0 and it's #{args[:offset]}" unless args[:offset].nil? or (args[:offset].kind_of? Fixnum and args[:offset] > 0)
       
       response=perform_request("get_user_contacts",args)
-      Slideshare::ContactList.from_xml(response).items
+      Slideshare::ContactList.from_xml(response)
     end
 
     # Gets the tags of the user whose credentials are provided
@@ -506,11 +520,11 @@ module Slideshare
     # [+username+] Username of the requesting user
     # [+password+] Password of the requesting user
     #
-    # returns a list of Tag instances
+    # returns a TagList instance
     #
-    # raise Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_user_tags(args={})
-    usage=%q{
+      usage=%q{
            Gets the tags of the user whose credentials are provided
 
            See http://www.slideshare.net/developers/documentation#get_user_tags for additional documentation
@@ -534,7 +548,112 @@ module Slideshare
       raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
       
       response=perform_request("get_user_tags",args)
-      Slideshare::TagList.from_xml(response).items
+      Slideshare::TagList.from_xml(response)
+    end
+
+
+    # Edits the slideshow with the given id
+    # 
+    # See http://www.slideshare.net/developers/documentation#get_user_tags for additional documentation
+    #
+    # Required arguments
+    # [+slideshow_id+] Id of the slideshow
+    # [+username+] Username of the owner of the slideshow
+    # [+password+] Password of the owner of the slideshow
+    #
+    # Optional arguments
+    # [+title+] The new title for the slideshow
+    # [+description+] The new description for the slideshow
+    # [+tags+] A list of strings, representing the new tags for the slideshow
+    # [+make_private+] Should be true if you want to make the slideshow private. If this is not set, following arguments will not be considered
+    # [+generate_secret_url+] Set to true to generate a secret URL for the slideshow. Requires make_slideshow_private to be true
+    # [+allow_embeds+] Set to true if other websites should be allowed to embed the slideshow. Requires make_slideshow_private to be true
+    # [+share_with_contacts+] Set to true if your contacts on SlideShare can view the slideshow. Requires make_slideshow_private to be true
+    #
+    # Returs true if the slideshow has been successfully updated, false otherwise
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+    def edit_slideshow(args={})
+      usage=%q{
+           Edits the slideshow with the given id
+
+           See http://www.slideshare.net/developers/documentation#get_user_tags for additional documentation
+
+           Required arguments
+           [+slideshow_id+] Id of the slideshow
+           [+username+] Username of the owner of the slideshow
+           [+password+] Password of the owner of the slideshow
+
+           Optional arguments
+           :title => The new title for the slideshow
+           :description => The new description for the slideshow
+           :tags => A list of strings, representing the new tags for the slideshow
+           :make_private => Should be true if you want to make the slideshow private. If this is not set, following arguments will not be considered
+           :generate_secret_url => Generate a secret URL for the slideshow. Requires make_slideshow_private to be true
+           :allow_embeds => Sets if other websites should be allowed to embed the slideshow. Requires make_slideshow_private to be true
+           :share_with_contacts => Sets if your contacts on SlideShare can view the slideshow. Requires make_slideshow_private to be true
+
+           Returs true if the slideshow has been successfully updated, false otherwise
+
+           raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
+      }
+      raise ArgumentError.new "No arguments provided. Usage:\n#{usage}" if args.empty?
+      default_args={
+        :slideshow_id => nil,
+        :username => nil,
+        :password => nil,
+        :title=>nil,
+        :description=>nil,
+        :tags=>nil,
+        :make_private => false,
+        :generate_secret_url => nil,
+        :allow_embeds => nil,
+        :share_with_contacts=>nil
+      }
+
+      args=default_args.merge args
+      args.reject!{|k,v| args[k].nil?}
+
+      raise ArgumentError.new ":slideshow_id must be a string and it's #{args[:slideshow_id]}" unless args[:slideshow_id].kind_of? String
+      raise ArgumentError.new ":username must be a string and it's #{args[:username]}" unless args[:username].kind_of? String
+      raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
+      raise ArgumentError.new ":title must be a string and it's #{args[:title]}" unless args[:title].nil? or args[:title].kind_of? String
+      raise ArgumentError.new ":description must be a string and it's #{args[:description]}" unless args[:description].nil? or args[:description].kind_of? String
+      raise ArgumentError.new ":tags must be a list of strings and it's #{args[:tags]}" unless args[:tags].nil? or args[:tags].kind_of? Array
+      raise ArgumentError.new ":make_private must be a true or false and it's #{args[:make_private]}" unless args[:make_private]==true or args[:make_private]==false
+      raise ArgumentError.new ":generate_secret_url only makes sense if make_private_is_true" if args[:make_private]==false and args.member? :generate_secret_url
+      raise ArgumentError.new ":allow_embeds only makes sense if make_private_is_true" if args[:make_private]==false and args.member? :allow_embeds
+      raise ArgumentError.new ":share_with_contacts only makes sense if make_private_is_true" if args[:make_private]==false and args.member? :share_with_contacts
+      raise ArgumentError.new "if present, :generate_secret_url must be true or false and it's #{args[:generate_secret_url]}" unless args[:generate_secret_url].nil? or args[:generate_secret_url]==true or args[:generate_secret_url]==false
+      raise ArgumentError.new "if present, :allow_embeds must be true or false and it's #{args[:allow_embeds]}" unless args[:allow_embeds].nil? or args[:allow_embeds]==true or args[:allow_embeds]==false
+      raise ArgumentError.new "if present, :share_with_contacts must be true or false and it's #{args[:share_with_contacts]}" unless args[:share_with_contacts].nil? or args[:share_with_contacts]==true  or args[:share_with_contacts]==false
+
+      if args[:title]
+        args[:slideshow_title]=args[:title]
+        args.delete :title
+      end
+
+      if args[:description]
+        args[:slideshow_description]=args[:description]
+        args.delete :description
+      end
+
+      if args[:tags]
+        args[:slideshow_tags]=args[:tags].join(", ")
+        args.delete :tags
+      end
+
+      if args[:make_private]
+        args[:make_slideshow_private]='Y'
+        args.delete :make_private
+      end
+
+      args[:generate_secret_url] = args[:generate_secret_url] ? "Y" : "N" if args.member? :generate_secret_url
+      args[:allow_embeds] = args[:allow_embeds] ? "Y" : "N" if args.member? :allow_embeds
+      args[:share_with_contacts] = args[:share_with_contacts] ? "Y" : "N" if args.member? :share_with_contacts
+
+      response=perform_request("edit_slideshow",args)
+      Slideshare::EditSlideshowResponse.from_xml(response).success
     end
 
     private

@@ -7,7 +7,7 @@ include Slideshare
 describe GetSlideshowsByGroupResponse do
 
   describe "from_xml providing a complete an xml document with just one slideshow definition" do
-    before(:each) do
+    before(:all) do
         xml=%q{
           <Group>
            <Count>12344</Count>
@@ -83,7 +83,7 @@ describe GetSlideshowsByGroupResponse do
   end
 
     describe "from_xml providing a complete an xml document with two slideshow definition" do
-    before(:each) do
+    before(:all) do
         xml=%q{
            <Group>
            <Count>12344</Count>

@@ -7,7 +7,7 @@ include Slideshare
 describe TagList do
 
   describe "from_xml providing a complete an xml document with just one Tag definition" do
-    before(:each) do
+    before(:all) do
         xml=%q{
           <Tags>
             <Tag Owner="1" Count="10">

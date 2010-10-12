@@ -29,8 +29,9 @@ describe "API#get_user_groups" do
     it "should retrieve detailed content when requested" do
       response=@api.get_user_groups(:username_for=>"Bern7")
       response.should_not be_nil
-      response.should be_a_kind_of Array
+      response.should be_a_kind_of GroupList
       response.should_not be_empty
+      puts response.inspect
     end
 
   end

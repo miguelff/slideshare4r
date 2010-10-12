@@ -196,11 +196,47 @@ module Slideshare
 
     def self.extraction_rules
       {
-        :items =>["//Contact",lambda{|nodeset| nodeset.map{|element| Contact.from_xml(element)}}],
+        :items =>["/Contacts/Contact",lambda{|nodeset| nodeset.map{|element| Contact.from_xml(element.to_s)}}],
+      }
+    end
+
+    #tries to delagate unhandled requests to :items list
+    def method_missing(method,*args,&b)
+      if items.respond_to? method
+        items.method(method).call(*args,&b)
+      else
+        super.method_missing(method, *args,&b)
+      end
+    end
+     
+  end
+  
+
+  # Modelles the response of API#edit_slideshow method
+  #
+  # The following is the structure  of the XML returned by the API web method,
+  # which will be unmarshalled into an instance of this class.
+  #
+  #   <SlideShowEdited>
+  #     <SlideShowID>SlideShowID</SlideShowID>
+  #   </SlideShowEdited>
+  #
+  # An instance of EditSlideshowResponse has the following properties:
+  #
+  # [+slideshow_id+] The id of the slideshow edited
+  # [+success+] true if the slideshow was successfully updated; false otherwise
+  #
+  class EditSlideshowResponse
+    include Builder
+
+    def self.extraction_rules
+      {
+        :slideshow_id => ["/SlideShowEdited/SlideShowID"],
+        :success => ["/SlideShowEdited/SlideShowID",lambda{|node| node.empty? ? false : true}]
       }
     end
   end
-  
+
 
   # Modelles the response of API#get_slideshows_by_group method
   #
@@ -227,11 +263,21 @@ module Slideshare
 
     def self.extraction_rules
       {
-        :slideshows              =>["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element)}}],
+        :slideshows              =>["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element.to_s)}}],
         :total_number_of_results => ["/Group/Count",lambda{|node| node.text.to_i}],
         :group_searched          => ["/Group/Name"]
       }
     end
+
+    #tries to delagate unhandled requests to :slideshows list
+    def method_missing(method,*args,&b)
+      if slideshows.respond_to? method
+        slideshows.method(method).call(*args,&b)
+      else
+        super.method_missing(method, *args,&b)
+      end
+    end
+
   end
 
   # Modelles the response of API#get_slideshows_by_tag method
@@ -259,11 +305,21 @@ module Slideshare
 
     def self.extraction_rules
       {
-        :slideshows               =>["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element)}}],
+        :slideshows               =>["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element,to_s)}}],
         :total_number_of_results  => ["/Tag/Count",lambda{|node| node.text.to_i}],
         :tag_searched             => ["/Tag/Name"]
       }
     end
+
+    #tries to delagate unhandled requests to :slideshows list
+    def method_missing(method,*args,&b)
+      if slideshows.respond_to? method
+        slideshows.method(method).call(*args,&b)
+      else
+        super.method_missing(method, *args,&b)
+      end
+    end
+
   end
 
   # Modelles the response of API#get_slideshows_by_user method
@@ -291,11 +347,21 @@ module Slideshare
 
     def self.extraction_rules
       {
-        :slideshows              => ["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element)}}],
+        :slideshows              => ["//Slideshow",lambda{|nodeset| nodeset.map{|element| Slideshow.from_xml(element.to_s)}}],
         :total_number_of_results => ["/User/Count",lambda{|node| node.text.to_i}],
         :user_searched          =>  ["/User/Name"]
       }
     end
+
+    #tries to delagate unhandled requests to :slideshows list
+    def method_missing(method,*args,&b)
+      if slideshows.respond_to? method
+        slideshows.method(method).call(*args,&b)
+      else
+        super.method_missing(method, *args,&b)
+      end
+    end
+     
   end
 
 
@@ -365,9 +431,20 @@ module Slideshare
 
     def self.extraction_rules
       {
-        :items =>["/Groups/Group",lambda{|nodeset| nodeset.map{|element| Group.from_xml(element)}}],
+        :items =>["/Groups/Group", lambda{|nodeset| nodeset.map{|element| Group.from_xml(element.to_s)}}],
       }
     end
+    
+    #tries to delagate unhandled requests to :items list
+    def method_missing(method,*args,&b)
+      if items.respond_to? method
+        items.method(method).call(*args,&b)
+      else
+        super.method_missing(method, *args,&b)
+      end
+    end
+
+
   end
 
   # Modelles the result of searching for slideshows
@@ -406,6 +483,15 @@ module Slideshare
         :total_number_of_results => ["/Slideshows/Meta/TotalResults",lambda{|node| node.text.to_i}]
       }
     end
+
+    #tries to delagate unhandled requests to items list
+    def method_missing(method,*args,&b)
+      if items.respond_to? method
+        items.method(method).call(*args,&b)
+      else
+        super.method_missing(method, *args,&b)
+      end
+    end
   end
 
   # Modelles an error returned by any of the webmethods.
@@ -429,8 +515,8 @@ module Slideshare
 
     def self.extraction_rules
       {
-      :code=>["/SlideShareServiceError",lambda{|nodeset| nodeset.first["ID"].to_i}],
-      :message=>["/SlideShareServiceError/Message"]
+        :code=>["/SlideShareServiceError",lambda{|nodeset| nodeset.first["ID"].to_i}],
+        :message=>["/SlideShareServiceError/Message"]
       }
     end
 
@@ -738,6 +824,15 @@ module Slideshare
       {
         :items=>["/Tags/Tag",lambda{|nodeset| nodeset.map{|element| Tag.from_xml(element.to_s)}}]
       }
+    end
+
+    #tries to delagate unhandled requests to the items list
+    def method_missing(method,*args,&b)
+      if items.respond_to? method
+        items.method(method).call(*args,&b)
+      else
+        super.method_missing(method, *args,&b)
+      end
     end
 
   end
