@@ -539,7 +539,7 @@ module Slideshare
 
     private
 
-    #performs an HTTP request to the given webmethod using the given optional args
+    # performs an HTTP request to the given webmethod using the given optional arguments
     #
     # raise Slideshare::ServiceError if an error related to the service occurs
     # (wrong authorization, a required argument is missing...) when
