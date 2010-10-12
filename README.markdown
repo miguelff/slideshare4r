@@ -27,6 +27,6 @@ Take a look at [lib/slideshare.rb](http://github.com/miguelff/slideshare4r/blob/
 * download_slideshow
 * others?
 
-### Add support for HTTPS
+### Add support for HTTPS -> COMPLETED
 ### Code some usage examples
 
