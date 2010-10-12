@@ -10,7 +10,7 @@ module Slideshare
   #
   class API
 
-    attr_accessor :api_key, :shared_secret, :proxy
+    attr_reader :api_key, :shared_secret, :protocol, :proxy
 
     # Initializes a new instance of the API Façade
     # 
@@ -20,30 +20,30 @@ module Slideshare
     #
     # Optionally you can provide some arguments:
     #
-    #   :proxy_host and :proxy_port => if you are connecting to slideshare behind and HTTP proxy
-    #   :proxy_user and :proxy_pass => if the proxy needs authentication
+    #:proxy_host and :proxy_port => if you are connecting to slideshare behind and HTTP proxy
+    #:proxy_user and :proxy_pass => if the proxy needs authentication
+    #:protocol => either :http or :https for secure connections
     #
     def initialize(api_key, shared_secret, args={})
       raise ArgumentError.new "api_key must be a String and it's #{api_key}" unless api_key.kind_of? String
       raise ArgumentError.new "shared_secret must be a String and it's #{shared_secret}" unless shared_secret.kind_of? String
       default_args={
+        :protocol=>:https,
         :username=>nil,
         :password=>nil,
         :proxy_host=>nil,
-        :proxy_port=>nil,
+        :proxy_port=>8080,
         :proxy_user=>nil,
         :proxy_pass=>nil
       }
       args=default_args.merge args
+
+      raise ArgumentError.new "protocol must be either :http or :https" unless [:http,:https].member? args[:protocol]
+
+      @protocol=args[:protocol]
       @api_key=api_key
       @shared_secret=shared_secret
- 
-      proxy_host=args[:proxy_host]
-      proxy_port=args[:proxy_port]
-      proxy_user=args[:proxy_user]
-      proxy_pass=args[:proxy_pass]
-    
-      @proxy=Proxy.new(proxy_host,proxy_port,proxy_user,proxy_pass) unless proxy_host.nil?
+      @proxy=Proxy.new(args[:proxy_host],args[:proxy_port],args[:proxy_user],args[:proxy_pass]) unless args[:proxy_host].nil?
     end
   
     #
@@ -63,6 +63,8 @@ module Slideshare
     # [+detailed+] Whether or not to include optional information. true to include, false (default) for basic information.
     #
     # returns an Slideshow instance
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_slideshow(args={})
       usage=%q{
       Gets Slideshow Information
@@ -126,6 +128,8 @@ module Slideshare
     # [+detailed+] Whether or not to include optional information. true to include, false (default) for basic information.
     # 
     # returns a GetSlideshowsByTagResponse instance
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_slideshows_by_tag(args={})
       usage=%q{
        Get slideshows with a certain tag
@@ -177,6 +181,8 @@ module Slideshare
     # [+password+] password of the requesting user
     #
     # returns a list of Group instances
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_user_groups(args={})
       usage=%q{
          Gets the groups a user belongs to
@@ -227,6 +233,8 @@ module Slideshare
     # [+detailed+]  Whether or not to include optional information. true to include, false (default) for basic information.
     #
     # returns a GetSlideshowsByGroupResponse instance
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_slideshows_by_group(args={})
       usage=%q{
        Gets slideshows beonging to a certain user group.
@@ -281,6 +289,8 @@ module Slideshare
     # [+password+] Password of the requesting user
     #
     # returns a GetSlideshowsByUserResponse instance
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_slideshows_by_user(args={})
       usage=%q{
        Gets slideshows beonging to a certain user.
@@ -349,6 +359,8 @@ module Slideshare
     # [+detailed+] Whether or not to include optional information. +true+ to include, +false+ (default) for basic information.
     #
     # returns  an instance of SearchResults
+    #
+    # raises Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def search_slideshows(args={})
       usage=%q{
      Performs a search for slideshows
@@ -447,6 +459,9 @@ module Slideshare
     # [+limit+] Max number of items to return (defaults to 12)
     # [+offset+] The number of slides to skip, before returning results.
     #
+    # returns a list of Contact instances. Each element in the list modelles a user contact
+    #
+    # raise Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_user_contacts(args={})
        usage=%q{
          Gets the groups a user belongs to
@@ -492,6 +507,8 @@ module Slideshare
     # [+password+] Password of the requesting user
     #
     # returns a list of Tag instances
+    #
+    # raise Slideshare::ServiceError if an error related to the service occurs (wrong authorization, a required argument is missing...)
     def get_user_tags(args={})
     usage=%q{
            Gets the tags of the user whose credentials are provided
@@ -523,11 +540,15 @@ module Slideshare
     private
 
     #performs an HTTP request to the given webmethod using the given optional args
+    #
+    # raise Slideshare::ServiceError if an error related to the service occurs
+    # (wrong authorization, a required argument is missing...) when
+    # requesting the service URL.
     def perform_request(web_method,args={})
       ts=Time.now.to_i
       hash=Digest::SHA1.hexdigest(shared_secret+ts.to_s)
       args.merge! :api_key=>api_key, :ts=>ts, :hash=>hash
-      url=URL.new web_method, args
+      url=URL.new web_method, protocol, args
       url.get @proxy
     end
   

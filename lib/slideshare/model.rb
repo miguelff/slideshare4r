@@ -408,6 +408,38 @@ module Slideshare
     end
   end
 
+  # Modelles an error returned by any of the webmethods.
+  # As the API doens't return errors as standard HTTP status codes,
+  # we define this error as part of the model and not in the net module.
+  #
+  # The XML of a Service error is something as follows
+  #
+  #
+  #   <SlideShareServiceError>
+  #      <Message ID="9">SlideShow Not Found</Message>
+  #   </SlideShareServiceError>
+  #
+  # An instance of this error, has the following properties
+  #
+  # [+:error_id+] A code that identifies the error
+  # [+:message+] The error message
+  #
+  class ServiceError < StandardError
+    include Builder
+
+    def self.extraction_rules
+      {
+      :code=>["/SlideShareServiceError",lambda{|nodeset| nodeset.first["ID"].to_i}],
+      :message=>["/SlideShareServiceError/Message"]
+      }
+    end
+
+    def to_s
+      "Error (#{code}): #{message}"
+    end
+  end
+  
+
   
   # Modelles a Slideshow
   #

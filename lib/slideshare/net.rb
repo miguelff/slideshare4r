@@ -1,50 +1,49 @@
 require 'cgi'
-require 'net/http'
+require 'open-uri'
 require 'uri'
+require 'slideshare/model'
 
 module Slideshare
   
-  #An error raised when a request
-  #completes without success
-  class HTTPError < StandardError
-    attr_reader :response_class
-    
-    def initialize(response_class)
-      @response_class=response_class
-    end
-    
-    def to_s
-      response_class.to_s
-    end
-  end
-  
+
   # Adapts an API URL, providing a method to get its content.
   class URL
   
-    attr_reader  :path,  :query, :complete_path, :params, :url
+    attr_reader  :protocol, :method, :get_parameters, :complete_path, :query, :url
     alias :adaptee :url
   
-    BASE_URL="http://www.slideshare.net/api/2/"
+    BASE_URL="www.slideshare.net/api/2/"
   
-    # initializes a new slideshare url, appending the given path to the base API URL,
-    # and if provided, an URL-encoded flavor of the given args
-    def initialize(_path,args={})
-      raise ArgumentError.new("path cannot be nil") if _path.nil?
-      @path = _path.to_s
-      @query = args.to_a.map{|i| escape(i[0])+"="+escape(i[1])}.join("&")
-      @complete_path = path + (query.empty? ? "" : "?"+query)
-      @params = args
-      @url = URI.parse(BASE_URL+complete_path)
+    # Initializes a new webservice url
+    #
+    # [+method+] The webmethod to invoke.
+    # [+protocol+] Protocol to use, must be :http or :https
+    # [+args+] A set of the arguments for the URL. (GET parameters)
+    #
+    def initialize(method,protocol=:https,get_parameters={})
+      raise ArgumentError.new("method cannot be nil") if method.nil?
+      raise ArgumentError.new("protocol must be either :https or :http and it's #{protocol}") unless [:http,:https].member? protocol
+      @protocol = protocol
+      @method = method.to_s
+      @query = get_parameters.to_a.map{|i| escape(i[0])+"="+escape(i[1])}.join("&")
+      @complete_path = method.to_s + (query.empty? ? "" : "?"+query)
+      @get_parameters = get_parameters
+      @url = URI.parse("#{protocol}://#{BASE_URL}#{complete_path}")
     end
   
-    # Requests the document pointed by this URL
+    # Requests the content pointed by this URL
     #
-    # optionally you can provide a proxy to perform the Request.
+    # optionally you can provide an instance of Slideshare::Proxy to perform the request
+    #
+    # returns the content pointed by this url
+    #
+    # raise Slideshare::ServiceError if an error related to the service occurs
+    # (wrong authorization, a required argument is missing...)
     def get(proxy=nil)
-      net = (proxy.nil? ? Net::HTTP : proxy)
-      res=net.get_response(url)
-      raise HTTPError.new(res.class) unless res.kind_of? Net::HTTPSuccess
-      res.body
+      proxy = proxy.nil? ? nil : proxy.to_s
+      result=open(url,:proxy=>proxy).read
+      raise ServiceError.from_xml result if result =~ /SlideShareServiceError/
+      result
     end
 
     def hash
@@ -112,7 +111,9 @@ module Slideshare
      end
      
      def to_s
-       "#{user}@#{host}:#{port}"
+       credentials=""
+       credentials << "#{user}:#{password}@" if user and password
+       return "http://#{credentials}#{host}:#{port}"
      end
    end
    
