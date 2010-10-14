@@ -9,7 +9,7 @@ require 'rake/clean'
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 require 'rake/testtask'
-require 'spec/rake/spectask'
+require 'rspec/core/rake_task'
 
 
 
@@ -27,7 +27,12 @@ spec = Gem::Specification.new do |s|
   s.require_path = "lib"
   s.bindir = "bin"
   s.add_dependency('nokogiri', '>= 1.4.3.1')
+  s.add_dependency('rest-open-uri', '>= 1.0.0')
+  s.add_dependency('mime-types', '>= 1.16')
   s.requirements << 'nokogiri v1.4.3.1 or greater'
+  s.requirements << 'rest-open-uri v1.0.0 or greater'
+  s.requirements << 'mime-types v1.16 or greater'
+
 end
 
 Rake::GemPackageTask.new(spec) do |p|
@@ -51,9 +56,9 @@ Rake::TestTask.new do |t|
 end
 
 desc "Run all specs"
-Spec::Rake::SpecTask.new('spec') do |t|
-  t.spec_opts=["-f s"]
-  t.spec_files = FileList['spec/**/*.rb']
+RSpec::Core::RakeTask.new('spec') do |t|
+  t.rspec_opts=["-f s"]
+  t.pattern = 'spec/**/*.rb'
 end
 
 task :default => [:spec,:test]

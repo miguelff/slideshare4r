@@ -112,7 +112,7 @@ module Slideshare
       args[:exclude_tags] = args[:exclude_tags] ? 1 : 0 
       args[:detailed] = args[:detailed] ? 1 : 0 
       
-      response=perform_request("get_slideshow",args)
+      response=get("get_slideshow",args)
       Slideshare::Slideshow.from_xml(response)
     end
 
@@ -169,7 +169,7 @@ module Slideshare
 
       args[:detailed] = args[:detailed] ? 1 : 0 
 
-      response=perform_request("get_slideshows_by_tag",args)
+      response=get("get_slideshows_by_tag",args)
       Slideshare::GetSlideshowsByTagResponse.from_xml(response)
     end
 
@@ -220,7 +220,7 @@ module Slideshare
       raise ArgumentError.new ":username_for must be a string and it's #{args[:username_for]}" unless args[:username_for].kind_of? String
       raise ArgumentError.new ":password must be provided for :username=>#{args[:username]}" unless args[:username].nil? or not args[:password].nil?
 
-      response=perform_request("get_user_groups",args)
+      response=get("get_user_groups",args)
       Slideshare::GroupList.from_xml(response)
     end
 
@@ -278,7 +278,7 @@ module Slideshare
 
       args[:detailed] = args[:detailed] ? 1 : 0
 
-      response=perform_request("get_slideshows_by_group",args)
+      response=get("get_slideshows_by_group",args)
       Slideshare::GetSlideshowsByGroupResponse.from_xml(response)
     end
 
@@ -341,7 +341,7 @@ module Slideshare
 
       args[:detailed] = args[:detailed] ? 1 : 0
 
-      response=perform_request("get_slideshows_by_user",args)
+      response=get("get_slideshows_by_user",args)
       Slideshare::GetSlideshowsByUserResponse.from_xml(response)
     end
 
@@ -455,7 +455,7 @@ module Slideshare
 
       args[:detailed] = args[:detailed] ? 1 : 0
 
-      response=perform_request("search_slideshows",args)
+      response=get("search_slideshows",args)
       Slideshare::SearchResults.from_xml(response)
     end
 
@@ -508,7 +508,7 @@ module Slideshare
       raise ArgumentError.new ":limit must be a number greater than 0 and it's #{args[:limit]}" unless args[:limit].kind_of? Fixnum and args[:limit] > 0
       raise ArgumentError.new ":offset must be a number greater than 0 and it's #{args[:offset]}" unless args[:offset].nil? or (args[:offset].kind_of? Fixnum and args[:offset] > 0)
       
-      response=perform_request("get_user_contacts",args)
+      response=get("get_user_contacts",args)
       Slideshare::ContactList.from_xml(response)
     end
 
@@ -547,7 +547,7 @@ module Slideshare
       raise ArgumentError.new ":username must be a string and it's #{args[:username]}" unless args[:username].kind_of? String
       raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
       
-      response=perform_request("get_user_tags",args)
+      response=get("get_user_tags",args)
       Slideshare::TagList.from_xml(response)
     end
 
@@ -652,7 +652,7 @@ module Slideshare
       args[:allow_embeds] = args[:allow_embeds] ? "Y" : "N" if args.member? :allow_embeds
       args[:share_with_contacts] = args[:share_with_contacts] ? "Y" : "N" if args.member? :share_with_contacts
 
-      response=perform_request("edit_slideshow",args)
+      response=get("edit_slideshow",args)
       Slideshare::EditSlideshowResponse.from_xml(response).success
     end
 
@@ -697,7 +697,7 @@ module Slideshare
       raise ArgumentError.new ":username must be a string and it's #{args[:username]}" unless args[:username].kind_of? String
       raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
 
-      response=perform_request("delete_slideshow",args)
+      response=get("delete_slideshow",args)
       Slideshare::EditSlideshowResponse.from_xml(response).success
     end
 
@@ -742,7 +742,7 @@ module Slideshare
       raise ArgumentError.new ":username must be a string and it's #{args[:username]}" unless args[:username].kind_of? String
       raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
 
-      response=perform_request("add_favorite",args)
+      response=get("add_favorite",args)
       Slideshare::FavoriteSlideshowResponse.from_xml(response).success
     end
 
@@ -787,23 +787,39 @@ module Slideshare
       raise ArgumentError.new ":username must be a string and it's #{args[:username]}" unless args[:username].kind_of? String
       raise ArgumentError.new ":password must be a string and it's #{args[:password]}" unless args[:password].kind_of? String
 
-      response=perform_request("check_favorite",args)
+      response=get("check_favorite",args)
       Slideshare::CheckFavoriteResponse.from_xml(response).marked_as_favorite
     end
 
     private
+
+
+    def get(web_method,args={})
+      perform_request web_method,:get,args
+    end
+
+    def post(web_method,args={})
+      perform_request web_method,:post,args
+    end
 
     # performs an HTTP request to the given webmethod using the given optional arguments
     #
     # raise Slideshare::ServiceError if an error related to the service occurs
     # (wrong authorization, a required argument is missing...) when
     # requesting the service URL.
-    def perform_request(web_method,args={})
+    def perform_request(web_method,method,args={})
       ts=Time.now.to_i
       hash=Digest::SHA1.hexdigest(shared_secret+ts.to_s)
       args.merge! :api_key=>api_key, :ts=>ts, :hash=>hash
-      url=URL.new web_method, protocol, args
-      url.get @proxy
+      req=Request.new web_method, protocol, args
+      case method
+      when :get
+        req.perform_get @proxy
+      when :post
+        req.perform_multipart_post @proxy
+      else
+        raise ArgumentError.new "method must be :get or :post, but is #{method}"
+      end
     end
   
   end

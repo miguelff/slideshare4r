@@ -31,7 +31,6 @@ describe "API#get_user_groups" do
       response.should_not be_nil
       response.should be_a_kind_of GroupList
       response.should_not be_empty
-      puts response.inspect
     end
 
   end
